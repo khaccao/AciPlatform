@@ -1,0 +1,66 @@
+# Visual Studio
+.vs/
+.vscode/
+bin/
+obj/
+*.user
+*.suo
+*.sln.docstates
+
+# Rider
+.idea/
+*.sln.iml
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Entity Framework
+Migrations/*.cs
+*.db
+*.db-shm
+*.db-wal
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+
+# ReSharper
+.resharper
+*.resharper
+*.resharper.user
+*.DotSettings.user
+
+# JetBrains
+.idea/
+*.sln.iml
+
+# Local Environment
+local.settings.json
+.env
+.env.local
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# TestResults
+TestResults/
+coverage/
+*.opencover.xml
+
+# Artifacts
+artifacts/
