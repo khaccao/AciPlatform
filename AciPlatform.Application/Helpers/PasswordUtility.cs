@@ -1,0 +1,14 @@
+namespace AciPlatform.Application.Helpers;
+
+public static class PasswordUtility
+{
+    public static string HashPassword(string password)
+    {
+        return BCrypt.Net.BCrypt.HashPassword(password);
+    }
+
+    public static bool VerifyPassword(string password, string hash)
+    {
+        return BCrypt.Net.BCrypt.Verify(password, hash);
+    }
+}

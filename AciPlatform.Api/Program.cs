@@ -1,4 +1,10 @@
-using AciPlatform.Infrastructure;
+using AciPlatform.Application.Interfaces;
+using AciPlatform.Application.Services;
+using AciPlatform.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,11 +12,54 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpContextAccessor(); // Required for ConnectionStringProvider
 
-// Add Infrastructure services
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? "Server=(localdb)\\mssqllocaldb;Database=AciPlatformDb;Trusted_Connection=true;";
-builder.Services.AddInfrastructure(connectionString);
+// Register Infrastructure Services
+builder.Services.AddScoped<IConnectionStringProvider, ConnectionStringProvider>();
+
+// Register Application Services
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IMenuService, MenuService>();
+builder.Services.AddScoped<IUserRoleService, UserRoleService>();
+builder.Services.AddScoped<IWebAuthService, WebAuthService>();
+builder.Services.AddScoped<IUserRoleService, UserRoleService>();
+builder.Services.AddScoped<IWebAuthService, WebAuthService>();
+builder.Services.AddScoped<IInvoiceAuthorize, InvoiceAuthorize>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+
+// Configure DbContext with Dynamic Connection String
+builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
+{
+    var connectionStringProvider = sp.GetRequiredService<IConnectionStringProvider>();
+    var connectionString = connectionStringProvider.GetConnectionString();
+    options.UseSqlServer(connectionString);
+});
+
+// Register IApplicationDbContext (Scoped)
+builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+
+// Configure JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.ASCII.GetBytes(jwtSettings["Secret"] ?? "SuperSecretKeyDefault123!");
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false; // Set to true in production
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false, // Validate in production
+        ValidateAudience = false, // Validate in production
+        ClockSkew = TimeSpan.Zero
+    };
+});
 
 var app = builder.Build();
 
@@ -22,8 +71,26 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication(); // Ensure Authentication middleware is added
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Auto-migrate database on startup
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try 
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        context.Database.Migrate();
+        Console.WriteLine("Database migrated successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"An error occurred migrating the DB: {ex.Message}");
+    }
+}
 
 app.Run();
