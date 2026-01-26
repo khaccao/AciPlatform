@@ -8,26 +8,21 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// ============================
+// Add services to the container
+// ============================
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor(); // Required for ConnectionStringProvider
 
-// Register Infrastructure Services
+// ============================
+// Infrastructure
+// ============================
+
 builder.Services.AddScoped<IConnectionStringProvider, ConnectionStringProvider>();
 
-// Register Application Services
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IMenuService, MenuService>();
-builder.Services.AddScoped<IUserRoleService, UserRoleService>();
-builder.Services.AddScoped<IWebAuthService, WebAuthService>();
-builder.Services.AddScoped<IUserRoleService, UserRoleService>();
-builder.Services.AddScoped<IWebAuthService, WebAuthService>();
-builder.Services.AddScoped<IInvoiceAuthorize, InvoiceAuthorize>();
-builder.Services.AddScoped<ITokenService, TokenService>();
-
-// Configure DbContext with Dynamic Connection String
 builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
 {
     var connectionStringProvider = sp.GetRequiredService<IConnectionStringProvider>();
@@ -35,12 +30,27 @@ builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
     options.UseSqlServer(connectionString);
 });
 
-// Register IApplicationDbContext (Scoped)
-builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+builder.Services.AddScoped<IApplicationDbContext>(provider =>
+    provider.GetRequiredService<ApplicationDbContext>());
 
-// Configure JWT Authentication
+// ============================
+// Application Services
+// ============================
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IMenuService, MenuService>();
+builder.Services.AddScoped<IUserRoleService, UserRoleService>();
+builder.Services.AddScoped<IWebAuthService, WebAuthService>();
+builder.Services.AddScoped<IInvoiceAuthorize, InvoiceAuthorize>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+
+// ============================
+// JWT Authentication
+// ============================
+
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var key = Encoding.ASCII.GetBytes(jwtSettings["Secret"] ?? "SuperSecretKeyDefault123!");
+var secretKey = jwtSettings["Secret"] ?? "SuperSecretKeyDefault123!";
+var key = Encoding.ASCII.GetBytes(secretKey);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -49,21 +59,40 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false; // Set to true in production
+    options.RequireHttpsMetadata = false; // true when production + https
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = false, // Validate in production
-        ValidateAudience = false, // Validate in production
+
+        ValidateIssuer = false,   // set true if using Issuer
+        ValidateAudience = false, // set true if using Audience
+
         ClockSkew = TimeSpan.Zero
     };
 });
 
+// ============================
+// CORS (MAIN BRANCH)
+// ============================
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ============================
+// HTTP Pipeline
+// ============================
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -72,24 +101,28 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication(); // Ensure Authentication middleware is added
+app.UseCors("AllowAll");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
-// Auto-migrate database on startup
+// ============================
+// Auto migrate database
+// ============================
+
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
-    try 
+    try
     {
-        var context = services.GetRequiredService<ApplicationDbContext>();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         context.Database.Migrate();
         Console.WriteLine("Database migrated successfully.");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"An error occurred migrating the DB: {ex.Message}");
+        Console.WriteLine($"Database migration failed: {ex.Message}");
     }
 }
 
