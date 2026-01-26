@@ -125,26 +125,33 @@ jobs:
             if (!(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force }
             Set-Location $dir
             
-            # 1. Update Code using Token
+            # 1. Update/Clone Code (Force cleanup if corrupted)
             if (!(Test-Path .git)) {
+                Write-Host "Directory not a git repo, cleaning and cloning..."
+                Remove-Item -Path "*" -Recurse -Force -ErrorAction SilentlyContinue
                 git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/khaccao/AciPlatform.git .
             } else {
                 git fetch origin
                 git reset --hard origin/staging
             }
             
-            # 2. Setup .env if missing
-            if (!(Test-Path .env)) {
-                Copy-Item .env.example .env
-                (Get-Content .env) -replace 'your-username', 'khaccao' | Set-Content .env
-                (Get-Content .env) -replace 'DOCKER_IMAGE_TAG=latest', 'DOCKER_IMAGE_TAG=staging' | Set-Content .env
+            # 2. Setup .env
+            if (Test-Path .env.example) {
+                if (!(Test-Path .env)) {
+                    Copy-Item .env.example .env
+                    (Get-Content .env) -replace 'DOCKER_NAMESPACE=your-username', 'DOCKER_NAMESPACE=khaccao' | Set-Content .env
+                    (Get-Content .env) -replace 'DOCKER_IMAGE_TAG=latest', 'DOCKER_IMAGE_TAG=staging' | Set-Content .env
+                }
+            } else {
+                Write-Error "CRITICAL: .env.example not found after clone!"
+                exit 1
             }
             
-            # 3. Docker Sync (Ignore Credential Storage Error)
+            # 3. Docker Sync 
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
             docker-compose pull
             
-            # 4. Stop existing to avoid conflicts then Start
+            # 4. Restart Services
             docker-compose down
             docker-compose up -d
             
