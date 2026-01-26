@@ -121,7 +121,7 @@ jobs:
             
             # Pull latest code
             git fetch origin
-            git reset --hard origin/main
+            git reset --hard origin/staging
             
             # Update environment if needed
             if [ ! -f .env ]; then
