@@ -1,5 +1,10 @@
 using AciPlatform.Application.Interfaces;
 using AciPlatform.Domain.Entities;
+using AciPlatform.Domain.Entities.HoSoNhanSu;
+using AciPlatform.Domain.Entities.LuongPhucLoi;
+using AciPlatform.Domain.Entities.HopDong;
+using AciPlatform.Domain.Entities.ChamCong;
+using AciPlatform.Domain.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 
 namespace AciPlatform.Infrastructure.Persistence;
@@ -15,6 +20,24 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Menu> Menus { get; set; }
     public DbSet<MenuRole> MenuRoles { get; set; }
     public DbSet<Customer> Customers { get; set; }
+    public DbSet<Department> Departments { get; set; }
+    public DbSet<PositionDetail> PositionDetails { get; set; }
+    public DbSet<Degree> Degrees { get; set; }
+    public DbSet<Certificate> Certificates { get; set; }
+    public DbSet<Major> Majors { get; set; }
+    public DbSet<Relative> Relatives { get; set; }
+    public DbSet<HistoryAchievement> HistoryAchievements { get; set; }
+    public DbSet<DecisionType> DecisionTypes { get; set; }
+    public DbSet<Decide> Decides { get; set; }
+    public DbSet<Allowance> Allowances { get; set; }
+    public DbSet<AllowanceUser> AllowanceUsers { get; set; }
+    public DbSet<SalaryType> SalaryTypes { get; set; }
+    public DbSet<ContractType> ContractTypes { get; set; }
+    public DbSet<ContractFile> ContractFiles { get; set; }
+    public DbSet<UserContractHistory> UserContractHistories { get; set; }
+    public DbSet<TimeKeepingEntry> TimeKeepingEntries { get; set; }
+    public DbSet<UserCompany> UserCompanies { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -72,6 +95,22 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
         {
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Phone).IsUnique();
+        });
+
+        // Configure UserCompany entity
+        modelBuilder.Entity<UserCompany>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.UserId, e.CompanyCode }).IsUnique();
+            entity.Property(e => e.CompanyCode).HasMaxLength(50);
+        });
+
+        // Configure RefreshToken entity
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Token).HasMaxLength(200);
+            entity.HasIndex(e => e.Token).IsUnique();
         });
     }
 }

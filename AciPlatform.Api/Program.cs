@@ -1,5 +1,14 @@
 using AciPlatform.Application.Interfaces;
 using AciPlatform.Application.Services;
+using AciPlatform.Application.Interfaces.HoSoNhanSu;
+using AciPlatform.Application.Services.HoSoNhanSu;
+using AciPlatform.Application.Services.LuongPhucLoi;
+using AciPlatform.Application.Services.HopDong;
+using AciPlatform.Application.Services.ChamCong;
+using AciPlatform.Application.Interfaces.LuongPhucLoi;
+using AciPlatform.Application.Interfaces.HopDong;
+using AciPlatform.Application.Interfaces.ChamCong;
+using AciPlatform.Application.Interfaces.HoSoNhanSu;
 using AciPlatform.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +35,24 @@ builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 builder.Services.AddScoped<IWebAuthService, WebAuthService>();
 builder.Services.AddScoped<IInvoiceAuthorize, InvoiceAuthorize>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<IPositionDetailService, PositionDetailService>();
+builder.Services.AddScoped<IDegreeService, DegreeService>();
+builder.Services.AddScoped<ICertificateService, CertificateService>();
+builder.Services.AddScoped<IMajorService, MajorService>();
+builder.Services.AddScoped<IRelativeService, RelativeService>();
+builder.Services.AddScoped<IHistoryAchievementService, HistoryAchievementService>();
+builder.Services.AddScoped<IDecisionTypeService, DecisionTypeService>();
+builder.Services.AddScoped<IDecideService, DecideService>();
+builder.Services.AddScoped<IAllowanceService, AllowanceService>();
+builder.Services.AddScoped<IAllowanceUserService, AllowanceUserService>();
+builder.Services.AddScoped<ISalaryTypeService, SalaryTypeService>();
+builder.Services.AddScoped<IContractTypeService, ContractTypeService>();
+builder.Services.AddScoped<IContractFileService, ContractFileService>();
+builder.Services.AddScoped<IUserContractHistoryService, UserContractHistoryService>();
+builder.Services.AddScoped<ITimeKeepingService, TimeKeepingService>();
+builder.Services.AddScoped<IUserCompanyService, UserCompanyService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 // Configure DbContext with Dynamic Connection String
 builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
