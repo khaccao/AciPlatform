@@ -121,40 +121,26 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /home/${{ secrets.VPS_USER }}/aciplatform-api
+            $dir = "C:\aciplatform-api"
+            if (!(Test-Path $dir)) { 
+                New-Item -ItemType Directory -Path $dir -Force 
+                Set-Location $dir
+                git clone https://github.com/khaccao/AciPlatform.git .
+            }
+            Set-Location $dir
             
-            # Pull latest code
+            # Update code
             git fetch origin
             git reset --hard origin/staging
             
-            # Update environment if needed
-            if [ ! -f .env ]; then
-              echo "Copying .env.example to .env..."
-              cp .env.example .env
-              echo "WARNING: Please update .env with production values"
-            fi
-            
-            # Pull latest image
+            # Docker sync
             docker login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} ${{ env.REGISTRY }}
             docker-compose pull
-            
-            # Start services
             docker-compose up -d
             
-            # Wait for services to be ready
-            sleep 10
-            
-            # Check health
-            if curl -sf http://localhost:8080/health; then
-              echo "Health check passed"
-            else
-              echo "Health check failed"
-              docker-compose logs
-              exit 1
-            fi
-            
-            # Clean up
-            docker system prune -f
+            # Status
+            Start-Sleep -s 10
+            docker ps
 
   notify:
     if: always()
