@@ -122,24 +122,34 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             $dir = "C:\aciplatform-api"
-            if (!(Test-Path $dir)) { 
-                New-Item -ItemType Directory -Path $dir -Force 
-                Set-Location $dir
-                git clone https://github.com/khaccao/AciPlatform.git .
-            }
+            if (!(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force }
             Set-Location $dir
             
-            # Update code
-            git fetch origin
-            git reset --hard origin/staging
+            # 1. Update Code using Token
+            if (!(Test-Path .git)) {
+                git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/khaccao/AciPlatform.git .
+            } else {
+                git fetch origin
+                git reset --hard origin/staging
+            }
             
-            # Docker sync
-            docker login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} ${{ env.REGISTRY }}
+            # 2. Setup .env if missing
+            if (!(Test-Path .env)) {
+                Copy-Item .env.example .env
+                (Get-Content .env) -replace 'your-username', 'khaccao' | Set-Content .env
+                (Get-Content .env) -replace 'DOCKER_IMAGE_TAG=latest', 'DOCKER_IMAGE_TAG=staging' | Set-Content .env
+            }
+            
+            # 3. Docker Sync (Ignore Credential Storage Error)
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
             docker-compose pull
+            
+            # 4. Stop existing to avoid conflicts then Start
+            docker-compose down
             docker-compose up -d
             
-            # Status
-            Start-Sleep -s 10
+            # 5. Show Status
+            Start-Sleep -s 5
             docker ps
 
   notify:

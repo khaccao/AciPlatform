@@ -49,8 +49,8 @@ services:
     container_name: aciplatform-nginx
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - "8085:80"
+      - "4435:443"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./ssl:/etc/nginx/ssl:ro
