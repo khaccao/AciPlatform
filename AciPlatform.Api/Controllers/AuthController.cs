@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using AciPlatform.Application.Interfaces.HoSoNhanSu;
 
 namespace AciPlatform.Api.Controllers;
 
@@ -25,6 +26,8 @@ public class AuthController : ControllerBase
     private readonly IApplicationDbContext _context;
     private readonly ITokenService _tokenService;
     private readonly IInvoiceAuthorize _invoiceAuthorize;
+    private readonly IUserCompanyService _userCompanyService;
+    private readonly IRefreshTokenService _refreshTokenService;
 
     public AuthController(
         IUserService userService, 
@@ -33,7 +36,9 @@ public class AuthController : ControllerBase
         IConfiguration configuration, 
         IApplicationDbContext context,
         ITokenService tokenService,
-        IInvoiceAuthorize invoiceAuthorize)
+        IInvoiceAuthorize invoiceAuthorize,
+        IUserCompanyService userCompanyService,
+        IRefreshTokenService refreshTokenService)
     {
         _userService = userService;
         _userRoleService = userRoleService;
@@ -42,6 +47,8 @@ public class AuthController : ControllerBase
         _context = context;
         _tokenService = tokenService;
         _invoiceAuthorize = invoiceAuthorize;
+        _userCompanyService = userCompanyService;
+        _refreshTokenService = refreshTokenService;
     }
 
     [HttpPost("login")]
@@ -82,6 +89,20 @@ public class AuthController : ControllerBase
                 });
             }
 
+            // CompanyCode enforcement (if provided)
+            if (!string.IsNullOrWhiteSpace(model.CompanyCode))
+            {
+                var hasCompany = await _userCompanyService.ExistsAsync(user.Id, model.CompanyCode);
+                if (!hasCompany)
+                {
+                    return Ok(new ObjectReturn
+                    {
+                        message = "CompanyCode is invalid for this user",
+                        status = (int)ErrorEnum.USER_IS_NOT_EXIST
+                    });
+                }
+            }
+
             await _userService.UpdateLastLogin(user.Id);
 
             var roleIds = user.UserRoleIds?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
@@ -99,6 +120,8 @@ public class AuthController : ControllerBase
 
             var menus = await _menuService.GetMenuPermissionsByUserId(user.Id);
 
+            var refresh = await _refreshTokenService.CreateAsync(user.Id, TimeSpan.FromDays(30));
+
             return Ok(new ObjectReturn
             {
                 data = new
@@ -109,6 +132,7 @@ public class AuthController : ControllerBase
                     Avatar = user.Avatar,
                     Timekeeper = user.Timekeeper,
                     Token = tokenString,
+                    RefreshToken = refresh.Token,
                     TargetId = user.TargetId,
                     RoleName = roles,
                     Menus = menus,
@@ -193,12 +217,62 @@ public class AuthController : ControllerBase
         try
         {
             await _userService.Create(user, model.Password);
+            if (!string.IsNullOrWhiteSpace(model.CompanyCode))
+            {
+                await _userCompanyService.CreateAsync(user.Id, model.CompanyCode);
+            }
             return Ok(new { message = "User registered successfully" });
         }
         catch (Exception ex)
         {
             return BadRequest(new { message = ex.Message });
         }
+    }
+
+    [HttpPost("refresh")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Refresh([FromBody] RefreshRequest model)
+    {
+        if (string.IsNullOrWhiteSpace(model.RefreshToken))
+            return BadRequest(new { message = "RefreshToken is required" });
+
+        var rt = await _refreshTokenService.GetValidTokenAsync(model.RefreshToken);
+        if (rt == null)
+            return Unauthorized(new { message = "Invalid or expired refresh token" });
+
+        var user = await _userService.GetById(rt.UserId);
+        if (user == null)
+            return Unauthorized(new { message = "User not found" });
+
+        var roleIds = user.UserRoleIds?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
+        var roles = (await _userRoleService.GetAll())
+            .Where(o => roleIds.Contains(o.Id.ToString()))
+            .Select(x => x.Code)
+            .ToList();
+
+        var newAccessToken = _tokenService.GenerateToken(user, roles);
+        await _refreshTokenService.RevokeAsync(rt);
+        var newRefresh = await _refreshTokenService.CreateAsync(user.Id, TimeSpan.FromDays(30));
+
+        return Ok(new
+        {
+            token = newAccessToken,
+            refreshToken = newRefresh.Token
+        });
+    }
+
+    [HttpGet("username-check")]
+    [AllowAnonymous]
+    public async Task<IActionResult> UsernameCheck([FromQuery] string username)
+    {
+        if (string.IsNullOrWhiteSpace(username))
+            return BadRequest(new { message = "username is required" });
+
+        var companyCodes = await _userCompanyService.GetCompanyCodesByUsername(username.Trim());
+        if (!companyCodes.Any())
+            return NotFound(new { message = "User not found or no companies" });
+
+        return Ok(new { username = username.Trim(), companyCodes });
     }
 
     [HttpPost("guess-login")]

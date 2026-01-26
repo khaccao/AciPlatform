@@ -1,5 +1,13 @@
 using AciPlatform.Application.Interfaces;
 using AciPlatform.Application.Services;
+using AciPlatform.Application.Services.HoSoNhanSu;
+using AciPlatform.Application.Services.LuongPhucLoi;
+using AciPlatform.Application.Services.HopDong;
+using AciPlatform.Application.Services.ChamCong;
+using AciPlatform.Application.Interfaces.LuongPhucLoi;
+using AciPlatform.Application.Interfaces.HopDong;
+using AciPlatform.Application.Interfaces.ChamCong;
+using AciPlatform.Application.Interfaces.HoSoNhanSu;
 using AciPlatform.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -8,21 +16,42 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ============================
-// Add services to the container
-// ============================
-
+// Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor(); // Required for ConnectionStringProvider
 
-// ============================
-// Infrastructure
-// ============================
-
+// Register Infrastructure Services
 builder.Services.AddScoped<IConnectionStringProvider, ConnectionStringProvider>();
 
+// Register Application Services
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IMenuService, MenuService>();
+builder.Services.AddScoped<IUserRoleService, UserRoleService>();
+builder.Services.AddScoped<IWebAuthService, WebAuthService>();
+builder.Services.AddScoped<IInvoiceAuthorize, InvoiceAuthorize>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<IPositionDetailService, PositionDetailService>();
+builder.Services.AddScoped<IDegreeService, DegreeService>();
+builder.Services.AddScoped<ICertificateService, CertificateService>();
+builder.Services.AddScoped<IMajorService, MajorService>();
+builder.Services.AddScoped<IRelativeService, RelativeService>();
+builder.Services.AddScoped<IHistoryAchievementService, HistoryAchievementService>();
+builder.Services.AddScoped<IDecisionTypeService, DecisionTypeService>();
+builder.Services.AddScoped<IDecideService, DecideService>();
+builder.Services.AddScoped<IAllowanceService, AllowanceService>();
+builder.Services.AddScoped<IAllowanceUserService, AllowanceUserService>();
+builder.Services.AddScoped<ISalaryTypeService, SalaryTypeService>();
+builder.Services.AddScoped<IContractTypeService, ContractTypeService>();
+builder.Services.AddScoped<IContractFileService, ContractFileService>();
+builder.Services.AddScoped<IUserContractHistoryService, UserContractHistoryService>();
+builder.Services.AddScoped<ITimeKeepingService, TimeKeepingService>();
+builder.Services.AddScoped<IUserCompanyService, UserCompanyService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+
+// Configure DbContext with Dynamic Connection String
 builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
 {
     var connectionStringProvider = sp.GetRequiredService<IConnectionStringProvider>();
@@ -30,27 +59,12 @@ builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
     options.UseSqlServer(connectionString);
 });
 
-builder.Services.AddScoped<IApplicationDbContext>(provider =>
-    provider.GetRequiredService<ApplicationDbContext>());
+// Register IApplicationDbContext (Scoped)
+builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
-// ============================
-// Application Services
-// ============================
-
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IMenuService, MenuService>();
-builder.Services.AddScoped<IUserRoleService, UserRoleService>();
-builder.Services.AddScoped<IWebAuthService, WebAuthService>();
-builder.Services.AddScoped<IInvoiceAuthorize, InvoiceAuthorize>();
-builder.Services.AddScoped<ITokenService, TokenService>();
-
-// ============================
-// JWT Authentication
-// ============================
-
+// Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSettings["Secret"] ?? "SuperSecretKeyDefault123!";
-var key = Encoding.ASCII.GetBytes(secretKey);
+var key = Encoding.ASCII.GetBytes(jwtSettings["Secret"] ?? "SuperSecretKeyDefault123!");
 
 builder.Services.AddAuthentication(options =>
 {
@@ -59,40 +73,21 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false; // true when production + https
+    options.RequireHttpsMetadata = false; // Set to true in production
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(key),
-
-        ValidateIssuer = false,   // set true if using Issuer
-        ValidateAudience = false, // set true if using Audience
-
+        ValidateIssuer = false, // Validate in production
+        ValidateAudience = false, // Validate in production
         ClockSkew = TimeSpan.Zero
     };
 });
 
-// ============================
-// CORS (MAIN BRANCH)
-// ============================
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
-
 var app = builder.Build();
 
-// ============================
-// HTTP Pipeline
-// ============================
-
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -101,28 +96,24 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
-
-app.UseAuthentication();
+app.UseAuthentication(); // Ensure Authentication middleware is added
 app.UseAuthorization();
 
 app.MapControllers();
 
-// ============================
-// Auto migrate database
-// ============================
-
+// Auto-migrate database on startup
 using (var scope = app.Services.CreateScope())
 {
-    try
+    var services = scope.ServiceProvider;
+    try 
     {
-        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var context = services.GetRequiredService<ApplicationDbContext>();
         context.Database.Migrate();
         Console.WriteLine("Database migrated successfully.");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Database migration failed: {ex.Message}");
+        Console.WriteLine($"An error occurred migrating the DB: {ex.Message}");
     }
 }
 

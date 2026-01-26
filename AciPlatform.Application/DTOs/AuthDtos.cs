@@ -11,6 +11,7 @@ public class AuthenticateModel
 {
     public string? Username { get; set; }
     public string? Password { get; set; }
+    public string? CompanyCode { get; set; }
 }
 
 public class ResetPasswordModel
@@ -75,6 +76,12 @@ public class RegisterRequest
     public string? FullName { get; set; }
     public string? Email { get; set; }
     public string? UserRoleIds { get; set; }
+    public string? CompanyCode { get; set; }
+}
+
+public class RefreshRequest
+{
+    public string RefreshToken { get; set; } = string.Empty;
 }
 
 public class LoginRequest
