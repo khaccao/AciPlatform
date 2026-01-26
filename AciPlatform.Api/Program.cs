@@ -1,6 +1,5 @@
 using AciPlatform.Application.Interfaces;
 using AciPlatform.Application.Services;
-using AciPlatform.Application.Interfaces.HoSoNhanSu;
 using AciPlatform.Application.Services.HoSoNhanSu;
 using AciPlatform.Application.Services.LuongPhucLoi;
 using AciPlatform.Application.Services.HopDong;
@@ -29,8 +28,6 @@ builder.Services.AddScoped<IConnectionStringProvider, ConnectionStringProvider>(
 // Register Application Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMenuService, MenuService>();
-builder.Services.AddScoped<IUserRoleService, UserRoleService>();
-builder.Services.AddScoped<IWebAuthService, WebAuthService>();
 builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 builder.Services.AddScoped<IWebAuthService, WebAuthService>();
 builder.Services.AddScoped<IInvoiceAuthorize, InvoiceAuthorize>();
