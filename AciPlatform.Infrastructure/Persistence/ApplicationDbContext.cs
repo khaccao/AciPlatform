@@ -38,6 +38,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<TimeKeepingEntry> TimeKeepingEntries { get; set; }
     public DbSet<UserCompany> UserCompanies { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<UserMenu> UserMenus { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -111,6 +112,23 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Token).HasMaxLength(200);
             entity.HasIndex(e => e.Token).IsUnique();
+        });
+
+        // Configure UserMenu entity
+        modelBuilder.Entity<UserMenu>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.UserId, e.MenuId }).IsUnique();
+
+            entity.HasOne(d => d.User)
+                  .WithMany()
+                  .HasForeignKey(d => d.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(d => d.Menu)
+                  .WithMany()
+                  .HasForeignKey(d => d.MenuId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

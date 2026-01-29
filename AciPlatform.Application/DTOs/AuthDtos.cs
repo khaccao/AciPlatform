@@ -100,3 +100,13 @@ public class CreateUserRequest
     public string? UserRoleIds { get; set; }
 }
 
+public class UserMenuAssignDto
+{
+    public int MenuId { get; set; }
+    public string? MenuCode { get; set; }
+    public bool View { get; set; }
+    public bool Add { get; set; }
+    public bool Edit { get; set; }
+    public bool Delete { get; set; }
+}
+

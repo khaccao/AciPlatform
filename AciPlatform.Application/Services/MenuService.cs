@@ -60,6 +60,31 @@ public class MenuService : IMenuService
             .Select(r => r.Code)
             .ToListAsync();
 
+        // Check for UserMenu assignments (higher priority)
+        var userMenus = await _context.UserMenus
+            .Where(um => um.UserId == userId)
+            .Include(um => um.Menu)
+            .ToListAsync();
+
+        if (userMenus.Any())
+        {
+            // User has specific menu assignments - return those
+            return userMenus.Select(um => new MenuPermissionDto
+            {
+                Id = um.MenuId,
+                MenuCode = um.MenuCode ?? um.Menu?.Code ?? string.Empty,
+                Name = um.Menu?.Name,
+                NameEN = um.Menu?.NameEN,
+                NameKO = um.Menu?.NameKO,
+                Order = um.Menu?.Order,
+                View = um.View,
+                Add = um.Add,
+                Edit = um.Edit,
+                Delete = um.Delete
+            }).OrderBy(m => m.Order).ToList();
+        }
+
+        // Fall back to role-based permissions
         if (roleCodes.Contains(SuperAdminRoleCode))
         {
             var allMenus = await _context.Menus.OrderBy(x => x.Order).ToListAsync();

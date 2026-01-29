@@ -50,6 +50,7 @@ builder.Services.AddScoped<IUserContractHistoryService, UserContractHistoryServi
 builder.Services.AddScoped<ITimeKeepingService, TimeKeepingService>();
 builder.Services.AddScoped<IUserCompanyService, UserCompanyService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+builder.Services.AddScoped<IUserMenuService, UserMenuService>();
 
 // Configure DbContext with Dynamic Connection String
 builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>

@@ -33,6 +33,7 @@ public interface IApplicationDbContext
     DbSet<TimeKeepingEntry> TimeKeepingEntries { get; }
     DbSet<UserCompany> UserCompanies { get; }
     DbSet<RefreshToken> RefreshTokens { get; }
+    DbSet<UserMenu> UserMenus { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
 

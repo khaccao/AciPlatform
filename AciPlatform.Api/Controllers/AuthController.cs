@@ -122,6 +122,15 @@ public class AuthController : ControllerBase
 
             var refresh = await _refreshTokenService.CreateAsync(user.Id, TimeSpan.FromDays(30));
 
+            // Set refresh token in HTTP-only cookie
+            Response.Cookies.Append("refreshToken", refresh.Token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true, // Set to true in production with HTTPS
+                SameSite = SameSiteMode.Strict,
+                Expires = refresh.ExpiresAt
+            });
+
             return Ok(new ObjectReturn
             {
                 data = new
@@ -132,7 +141,6 @@ public class AuthController : ControllerBase
                     Avatar = user.Avatar,
                     Timekeeper = user.Timekeeper,
                     Token = tokenString,
-                    RefreshToken = refresh.Token,
                     TargetId = user.TargetId,
                     RoleName = roles,
                     Menus = menus,
@@ -231,18 +239,37 @@ public class AuthController : ControllerBase
 
     [HttpPost("refresh")]
     [AllowAnonymous]
-    public async Task<IActionResult> Refresh([FromBody] RefreshRequest model)
+    public async Task<IActionResult> Refresh()
     {
-        if (string.IsNullOrWhiteSpace(model.RefreshToken))
-            return BadRequest(new { message = "RefreshToken is required" });
+        // Get refresh token from cookie
+        if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken) || string.IsNullOrWhiteSpace(refreshToken))
+        {
+            return Unauthorized(new ObjectReturn 
+            { 
+                message = "RefreshToken is required",
+                status = 401
+            });
+        }
 
-        var rt = await _refreshTokenService.GetValidTokenAsync(model.RefreshToken);
+        var rt = await _refreshTokenService.GetValidTokenAsync(refreshToken);
         if (rt == null)
-            return Unauthorized(new { message = "Invalid or expired refresh token" });
+        {
+            return Unauthorized(new ObjectReturn 
+            { 
+                message = "Invalid or expired refresh token",
+                status = 401
+            });
+        }
 
         var user = await _userService.GetById(rt.UserId);
         if (user == null)
-            return Unauthorized(new { message = "User not found" });
+        {
+            return Unauthorized(new ObjectReturn 
+            { 
+                message = "User not found",
+                status = 401
+            });
+        }
 
         var roleIds = user.UserRoleIds?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
         var roles = (await _userRoleService.GetAll())
@@ -251,13 +278,31 @@ public class AuthController : ControllerBase
             .ToList();
 
         var newAccessToken = _tokenService.GenerateToken(user, roles);
+        
+        // Revoke old refresh token and create new one
         await _refreshTokenService.RevokeAsync(rt);
         var newRefresh = await _refreshTokenService.CreateAsync(user.Id, TimeSpan.FromDays(30));
 
-        return Ok(new
+        // Set new refresh token in HTTP-only cookie
+        Response.Cookies.Append("refreshToken", newRefresh.Token, new CookieOptions
         {
-            token = newAccessToken,
-            refreshToken = newRefresh.Token
+            HttpOnly = true,
+            Secure = true, // Set to true in production with HTTPS
+            SameSite = SameSiteMode.Strict,
+            Expires = newRefresh.ExpiresAt
+        });
+
+        var menus = await _menuService.GetMenuPermissionsByUserId(user.Id);
+
+        return Ok(new ObjectReturn
+        {
+            data = new
+            {
+                Token = newAccessToken,
+                Menus = menus
+            },
+            status = 200,
+            message = "Token refreshed successfully"
         });
     }
 
