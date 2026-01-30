@@ -17,6 +17,13 @@ public class RelativesController : ControllerBase
         _service = service;
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var items = await _service.GetAllAsync();
+        return Ok(items);
+    }
+
     [HttpGet("user/{userId}")]
     public async Task<IActionResult> GetByUser(int userId)
     {

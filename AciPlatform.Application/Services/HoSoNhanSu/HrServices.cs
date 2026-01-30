@@ -142,6 +142,14 @@ public class DegreeService : IDegreeService
         return await _context.Degrees.Where(x => !x.IsDeleted).OrderBy(x => x.Id).ToListAsync();
     }
 
+    public async Task<IEnumerable<Degree>> GetByUserAsync(int userId)
+    {
+        return await _context.Degrees
+            .Where(x => x.UserId == userId && !x.IsDeleted)
+            .OrderByDescending(x => x.Id)
+            .ToListAsync();
+    }
+
     public async Task<Degree?> GetByIdAsync(int id)
     {
         return await _context.Degrees.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
@@ -151,6 +159,7 @@ public class DegreeService : IDegreeService
     {
         var entity = new Degree
         {
+            UserId = request.UserId,
             Name = request.Name.Trim(),
             School = request.School,
             Description = request.Description,
@@ -165,6 +174,7 @@ public class DegreeService : IDegreeService
     public async Task UpdateAsync(int id, DegreeRequest request)
     {
         var entity = await GetByIdAsync(id) ?? throw new KeyNotFoundException("Degree not found");
+        entity.UserId = request.UserId;
         entity.Name = request.Name.Trim();
         entity.School = request.School;
         entity.Description = request.Description;
@@ -199,6 +209,14 @@ public class CertificateService : ICertificateService
         return await _context.Certificates.Where(x => !x.IsDeleted).OrderBy(x => x.Id).ToListAsync();
     }
 
+    public async Task<IEnumerable<Certificate>> GetByUserAsync(int userId)
+    {
+        return await _context.Certificates
+            .Where(x => x.UserId == userId && !x.IsDeleted)
+            .OrderByDescending(x => x.Id)
+            .ToListAsync();
+    }
+
     public async Task<Certificate?> GetByIdAsync(int id)
     {
         return await _context.Certificates.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
@@ -208,6 +226,7 @@ public class CertificateService : ICertificateService
     {
         var entity = new Certificate
         {
+            UserId = request.UserId,
             Name = request.Name.Trim(),
             Issuer = request.Issuer,
             IssueDate = request.IssueDate,
@@ -223,6 +242,7 @@ public class CertificateService : ICertificateService
     public async Task UpdateAsync(int id, CertificateRequest request)
     {
         var entity = await GetByIdAsync(id) ?? throw new KeyNotFoundException("Certificate not found");
+        entity.UserId = request.UserId;
         entity.Name = request.Name.Trim();
         entity.Issuer = request.Issuer;
         entity.IssueDate = request.IssueDate;

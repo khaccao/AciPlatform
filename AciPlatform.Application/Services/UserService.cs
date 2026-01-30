@@ -101,6 +101,9 @@ public class UserService : IUserService
         user.UserRoleIds = userParam.UserRoleIds;
         user.BranchId = userParam.BranchId;
         user.DepartmentId = userParam.DepartmentId;
+        user.PositionDetailId = userParam.PositionDetailId;
+        user.Gender = userParam.Gender;
+        user.BirthDay = userParam.BirthDay;
         user.Address = userParam.Address;
         user.RequestPassword = userParam.RequestPassword;
         user.UpdatedDate = DateTime.Now;
@@ -221,7 +224,30 @@ public class UserService : IUserService
             query = query.Where(x => filterParams.Ids.Contains(x.Id));
 
         var totalItems = await query.CountAsync();
-        var users = await query
+        
+        var users = await (from u in query
+                          join d in _context.Departments on u.DepartmentId equals d.Id into deptJoin
+                          from dept in deptJoin.DefaultIfEmpty()
+                          join p in _context.PositionDetails on u.PositionDetailId equals p.Id into posJoin
+                          from pos in posJoin.DefaultIfEmpty()
+                          select new {
+                              u.Id,
+                              u.Username,
+                              u.FullName,
+                              u.Email,
+                              u.Phone,
+                              u.UserRoleIds,
+                              u.DepartmentId,
+                              u.PositionDetailId,
+                              u.BirthDay,
+                              u.Gender,
+                              u.Address,
+                              u.Avatar,
+                              u.Status,
+                              u.CreatedDate,
+                              DepartmentName = dept != null ? dept.Name : string.Empty,
+                              PositionName = pos != null ? pos.Name : string.Empty
+                          })
             .OrderByDescending(x => x.CreatedDate)
             .Skip((filterParams.CurrentPage - 1) * filterParams.PageSize)
             .Take(filterParams.PageSize)

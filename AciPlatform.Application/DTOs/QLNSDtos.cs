@@ -32,6 +32,7 @@ public class PositionDetailResponse : PositionDetailRequest
 // Degree
 public class DegreeRequest
 {
+    public int UserId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? School { get; set; }
     public string? Description { get; set; }
@@ -46,6 +47,7 @@ public class DegreeResponse : DegreeRequest
 // Certificate
 public class CertificateRequest
 {
+    public int UserId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Issuer { get; set; }
     public DateTime? IssueDate { get; set; }

@@ -24,6 +24,13 @@ public class DegreesController : ControllerBase
         return Ok(items);
     }
 
+    [HttpGet("user/{userId}")]
+    public async Task<IActionResult> GetByUser(int userId)
+    {
+        var items = await _service.GetByUserAsync(userId);
+        return Ok(items);
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {

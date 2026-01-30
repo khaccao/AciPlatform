@@ -24,6 +24,7 @@ public interface IPositionDetailService
 public interface IDegreeService
 {
     Task<IEnumerable<Degree>> GetAllAsync();
+    Task<IEnumerable<Degree>> GetByUserAsync(int userId);
     Task<Degree?> GetByIdAsync(int id);
     Task<Degree> CreateAsync(DegreeRequest request);
     Task UpdateAsync(int id, DegreeRequest request);
@@ -33,6 +34,7 @@ public interface IDegreeService
 public interface ICertificateService
 {
     Task<IEnumerable<Certificate>> GetAllAsync();
+    Task<IEnumerable<Certificate>> GetByUserAsync(int userId);
     Task<Certificate?> GetByIdAsync(int id);
     Task<Certificate> CreateAsync(CertificateRequest request);
     Task UpdateAsync(int id, CertificateRequest request);
@@ -50,6 +52,7 @@ public interface IMajorService
 
 public interface IRelativeService
 {
+    Task<IEnumerable<Relative>> GetAllAsync();
     Task<IEnumerable<Relative>> GetByUserAsync(int userId);
     Task<Relative?> GetByIdAsync(int id);
     Task<Relative> CreateAsync(RelativeRequest request);
@@ -59,6 +62,7 @@ public interface IRelativeService
 
 public interface IHistoryAchievementService
 {
+    Task<IEnumerable<HistoryAchievement>> GetAllAsync();
     Task<IEnumerable<HistoryAchievement>> GetByUserAsync(int userId);
     Task<HistoryAchievement?> GetByIdAsync(int id);
     Task<HistoryAchievement> CreateAsync(HistoryAchievementRequest request);
@@ -77,6 +81,7 @@ public interface IDecisionTypeService
 
 public interface IDecideService
 {
+    Task<IEnumerable<Decide>> GetAllAsync();
     Task<IEnumerable<Decide>> GetByUserAsync(int userId);
     Task<Decide?> GetByIdAsync(int id);
     Task<Decide> CreateAsync(DecideRequest request);

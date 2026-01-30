@@ -40,9 +40,9 @@ public class UsersController : ControllerBase
             BirthDay = param.Birthday,
             Gender = param.Gender,
             Keyword = param.SearchText,
-            PositionId = param.Positionid,
+            PositionId = param.PositionId,
             WarehouseId = param.Warehouseid,
-            DepartmentId = param.Departmentid,
+            DepartmentId = param.DepartmentId,
             RequestPassword = param.RequestPassword,
             Quit = param.Quit,
             CurrentPage = param.Page,
@@ -85,6 +85,11 @@ public class UsersController : ControllerBase
         user.Email = model.Email;
         user.Phone = model.Phone;
         user.UserRoleIds = model.UserRoleIds;
+        user.DepartmentId = model.DepartmentId;
+        user.PositionDetailId = model.PositionDetailId;
+        user.Gender = model.Gender;
+        user.BirthDay = model.BirthDay;
+        user.Address = model.Address;
 
         await _userService.Update(user, model.Password);
         return Ok(new { message = "User updated successfully" });
@@ -100,6 +105,11 @@ public class UsersController : ControllerBase
             Email = model.Email,
             Phone = model.Phone,
             UserRoleIds = model.UserRoleIds,
+            DepartmentId = model.DepartmentId,
+            PositionDetailId = model.PositionDetailId,
+            Gender = model.Gender,
+            BirthDay = model.BirthDay,
+            Address = model.Address,
             CreatedDate = DateTime.Now,
             Status = 1
         };

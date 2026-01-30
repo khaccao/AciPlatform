@@ -1,3 +1,6 @@
+using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+
 namespace AciPlatform.Application.DTOs;
 
 public class ObjectReturn
@@ -98,7 +101,27 @@ public class CreateUserRequest
     public string? Email { get; set; }
     public string? Phone { get; set; }
     public string? UserRoleIds { get; set; }
+    [JsonPropertyName("departmentId")]
+    [JsonProperty("departmentId")]
+    public int? DepartmentId { get; set; }
+
+    [JsonPropertyName("positionDetailId")]
+    [JsonProperty("positionDetailId")]
+    public int? PositionDetailId { get; set; }
+
+    [JsonPropertyName("gender")]
+    [JsonProperty("gender")]
+    public int? Gender { get; set; }
+
+    [JsonPropertyName("birthDay")]
+    [JsonProperty("birthDay")]
+    public DateTime? BirthDay { get; set; }
+
+    [JsonPropertyName("address")]
+    [JsonProperty("address")]
+    public string? Address { get; set; }
 }
+
 
 public class UserMenuAssignDto
 {

@@ -23,6 +23,7 @@ public interface IContractFileService
 
 public interface IUserContractHistoryService
 {
+    Task<IEnumerable<UserContractHistory>> GetAllAsync();
     Task<IEnumerable<UserContractHistory>> GetByUserAsync(int userId);
     Task<UserContractHistory?> GetByIdAsync(int id);
     Task<UserContractHistory> CreateAsync(UserContractHistoryRequest request);

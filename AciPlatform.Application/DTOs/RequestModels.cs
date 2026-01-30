@@ -17,9 +17,9 @@ public class UserViewModel
     public string? SearchText { get; set; }
     public DateTime? Birthday { get; set; }
     public int? Gender { get; set; }
-    public int? Positionid { get; set; }
+    public int? PositionId { get; set; }
     public int? Warehouseid { get; set; }
-    public int? Departmentid { get; set; }
+    public int? DepartmentId { get; set; }
     public bool? RequestPassword { get; set; }
     public bool? Quit { get; set; }
     public DateTime? StartDate { get; set; }

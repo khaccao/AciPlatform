@@ -129,6 +129,14 @@ public class UserContractHistoryService : IUserContractHistoryService
         _context = context;
     }
 
+    public async Task<IEnumerable<UserContractHistory>> GetAllAsync()
+    {
+        return await _context.UserContractHistories
+            .Where(x => !x.IsDeleted)
+            .OrderByDescending(x => x.Id)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<UserContractHistory>> GetByUserAsync(int userId)
     {
         return await _context.UserContractHistories

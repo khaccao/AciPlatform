@@ -70,6 +70,14 @@ public class DecideService : IDecideService
         _context = context;
     }
 
+    public async Task<IEnumerable<Decide>> GetAllAsync()
+    {
+        return await _context.Decides
+            .Where(x => !x.IsDeleted)
+            .OrderByDescending(x => x.Id)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<Decide>> GetByUserAsync(int userId)
     {
         return await _context.Decides

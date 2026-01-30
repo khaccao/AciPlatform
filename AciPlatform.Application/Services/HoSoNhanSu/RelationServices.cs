@@ -15,6 +15,14 @@ public class RelativeService : IRelativeService
         _context = context;
     }
 
+    public async Task<IEnumerable<Relative>> GetAllAsync()
+    {
+        return await _context.Relatives
+            .Where(x => !x.IsDeleted)
+            .OrderByDescending(x => x.Id)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<Relative>> GetByUserAsync(int userId)
     {
         return await _context.Relatives
@@ -77,6 +85,14 @@ public class HistoryAchievementService : IHistoryAchievementService
     public HistoryAchievementService(IApplicationDbContext context)
     {
         _context = context;
+    }
+
+    public async Task<IEnumerable<HistoryAchievement>> GetAllAsync()
+    {
+        return await _context.HistoryAchievements
+            .Where(x => !x.IsDeleted)
+            .OrderByDescending(x => x.Id)
+            .ToListAsync();
     }
 
     public async Task<IEnumerable<HistoryAchievement>> GetByUserAsync(int userId)
