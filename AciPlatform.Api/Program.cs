@@ -22,6 +22,19 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor(); // Required for ConnectionStringProvider
 
+// Configure CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
+});
+
 // Register Infrastructure Services
 builder.Services.AddScoped<IConnectionStringProvider, ConnectionStringProvider>();
 
@@ -97,6 +110,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowFrontend");
+
 app.UseAuthentication(); // Ensure Authentication middleware is added
 app.UseAuthorization();
 
@@ -106,7 +121,7 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    try 
+    try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         context.Database.Migrate();
