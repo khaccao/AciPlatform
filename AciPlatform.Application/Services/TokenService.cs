@@ -20,7 +20,7 @@ public class TokenService : ITokenService
         _context = context;
     }
 
-    public string GenerateToken(User user, List<string> roles)
+    public string GenerateToken(User user, List<string> roles, string? companyCode = null)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"] ?? throw new InvalidOperationException("Jwt:Secret is not configured"));
@@ -31,8 +31,15 @@ public class TokenService : ITokenService
             new Claim(ClaimTypes.Name, user.Username),
             new Claim("FullName", user.FullName ?? ""),
             new Claim("RoleName", JsonSerializer.Serialize(roles)),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // Added Jti as standard practice
+            new Claim("CompanyCode", companyCode ?? ""),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
+        
+        // Add roles as standard Role claims
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

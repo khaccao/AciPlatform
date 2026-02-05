@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace AciPlatform.Api.Controllers;
 
-[Authorize]
+[Authorize(Roles = "SuperAdmin,ADMINCOMPANY")]
 [Route("api/[controller]")]
 [ApiController]
 public class MenusController : ControllerBase
@@ -36,7 +36,22 @@ public class MenusController : ControllerBase
     [HttpGet("list")]
     public async Task<IActionResult> GetList([FromQuery] MenuPagingationRequestModel param)
     {
+        var identityUser = HttpContext.GetIdentityUser();
+        string roles = identityUser.Role ?? "[]";
+        List<string> listRole = JsonConvert.DeserializeObject<List<string>>(roles) ?? new List<string>();
+
         var results = await _menuService.GetAll(param.isParent);
+        
+        // If not SuperAdmin, filter results to only include menus the current user has access to
+        if (!listRole.Contains("SuperAdmin"))
+        {
+             // Get permissions for current user
+             var userPermissions = await _menuService.GetMenuPermissionsByUserId(identityUser.Id);
+             var allowedMenuIds = userPermissions.Where(p => p.View).Select(p => p.Id).ToHashSet();
+             
+             results = results.Where(m => allowedMenuIds.Contains(m.Id));
+        }
+
         return Ok(new BaseResponseCommonModel
         {
             Data = results,

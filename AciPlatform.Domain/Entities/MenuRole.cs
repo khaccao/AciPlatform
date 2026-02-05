@@ -19,6 +19,7 @@ public class MenuRole
     public bool? Add { get; set; } = false;
     public bool? Edit { get; set; } = false;
     public bool? Delete { get; set; } = false;
+    public bool? Approve { get; set; } = false;
 
     [ForeignKey("MenuId")]
     public virtual Menu? Menu { get; set; }

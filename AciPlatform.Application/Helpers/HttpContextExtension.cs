@@ -31,6 +31,7 @@ public static class HttpContextExtension
             UserName = httpContext.User?.Identity?.Name ?? string.Empty,
             Role = httpContext.GetClaim("RoleName", string.Empty)!,
             FullName = httpContext.GetClaim("FullName", string.Empty)!,
+            CompanyCode = httpContext.GetClaim("CompanyCode", string.Empty)!,
         };
     }
 

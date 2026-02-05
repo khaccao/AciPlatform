@@ -214,6 +214,36 @@ public class UserService : IUserService
         if (!string.IsNullOrEmpty(filterParams.Keyword))
             query = query.Where(x => x.Username.Contains(filterParams.Keyword) || (x.FullName != null && x.FullName.Contains(filterParams.Keyword)));
 
+        // Multi-tenancy filtering
+        if (!filterParams.roles.Contains("SuperAdmin"))
+        {
+            // If not SuperAdmin, must filter by CompanyCode
+            var companyCode = filterParams.CompanyCode;
+            if (string.IsNullOrEmpty(companyCode))
+            {
+                // Safety: if no company code in token for non-superadmin, return empty
+                return new { TotalItems = 0, Data = new List<object>(), PageSize = filterParams.PageSize, CurrentPage = filterParams.CurrentPage };
+            }
+            
+            // Join with UserCompanies to filter
+            query = from u in query
+                    join uc in _context.UserCompanies on u.Id equals uc.UserId
+                    where uc.CompanyCode == companyCode
+                    select u;
+        }
+        else if (!string.IsNullOrEmpty(filterParams.Keyword) || !string.IsNullOrEmpty(filterParams.CompanyCode))
+        {
+            // For SuperAdmin, if they provide a CompanyCode (e.g. from a filter UI), we filter.
+            // But we don't force it from their token.
+            if (!string.IsNullOrEmpty(filterParams.CompanyCode))
+            {
+                query = from u in query
+                        join uc in _context.UserCompanies on u.Id equals uc.UserId
+                        where uc.CompanyCode == filterParams.CompanyCode
+                        select u;
+            }
+        }
+
         if (filterParams.Gender.HasValue)
             query = query.Where(x => x.Gender == filterParams.Gender);
 
@@ -242,11 +272,14 @@ public class UserService : IUserService
                               u.BirthDay,
                               u.Gender,
                               u.Address,
-                              u.Avatar,
+                              Avatar = u.Avatar,
                               u.Status,
                               u.CreatedDate,
                               DepartmentName = dept != null ? dept.Name : string.Empty,
-                              PositionName = pos != null ? pos.Name : string.Empty
+                              PositionName = pos != null ? pos.Name : string.Empty,
+                              CompanyCode = (from uc in _context.UserCompanies 
+                                            where uc.UserId == u.Id 
+                                            select uc.CompanyCode).FirstOrDefault()
                           })
             .OrderByDescending(x => x.CreatedDate)
             .Skip((filterParams.CurrentPage - 1) * filterParams.PageSize)

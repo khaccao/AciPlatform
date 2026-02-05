@@ -10,4 +10,5 @@ public interface IUserRoleService
     Task<UserRole> Create(UserRole role);
     Task<UserRole> Update(UserRole role);
     Task Delete(int id);
+    Task<IEnumerable<UserRole>> GetAll(string? companyCode);
 }

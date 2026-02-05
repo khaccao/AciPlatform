@@ -58,4 +58,24 @@ public class UserRoleService : IUserRoleService
             await _context.SaveChangesAsync();
         }
     }
+
+    public async Task<IEnumerable<UserRole>> GetAll(string? companyCode)
+    {
+        var query = _context.UserRoles.AsQueryable();
+
+        if (string.IsNullOrEmpty(companyCode))
+        {
+            // If no company code (SuperAdmin or system), maybe return all? 
+            // Or typically SuperAdmin sees all.
+        }
+        else
+        {
+            // Filter by CompanyCode
+            // Assuming NULL CompanyCode means "System" or "Global" roles that everyone can see (like 'User')
+            // Or maybe restrict strictly. Let's assume strict + shared system roles.
+            query = query.Where(x => x.CompanyCode == companyCode || x.CompanyCode == null);
+        }
+
+        return await query.OrderBy(x => x.Order).ToListAsync();
+    }
 }

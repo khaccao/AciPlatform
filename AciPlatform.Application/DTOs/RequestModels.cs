@@ -28,6 +28,7 @@ public class UserViewModel
     public int? Month { get; set; }
     public int? Degreeid { get; set; }
     public int? Certificateid { get; set; }
+    public string? CompanyCode { get; set; }
     public List<int>? Ids { get; set; }
 }
 
@@ -49,6 +50,7 @@ public class UserFilterParams
     public int? Month { get; set; }
     public int DegreeId { get; set; }
     public int CertificateId { get; set; }
+    public string? CompanyCode { get; set; }
     public List<int>? Ids { get; set; }
     public List<string> roles { get; set; } = new();
     public int UserId { get; set; }

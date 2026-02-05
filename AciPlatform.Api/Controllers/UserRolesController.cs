@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace AciPlatform.Api.Controllers;
 
-[Authorize]
+[Authorize(Roles = "SuperAdmin,ADMINCOMPANY")]
 [Route("api/[controller]")]
 [ApiController]
 public class UserRolesController : ControllerBase
@@ -42,14 +42,28 @@ public class UserRolesController : ControllerBase
     }
 
     [HttpGet("list")]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] string? companyCode = null)
     {
         var identityUser = HttpContext.GetIdentityUser();
-        int userId = identityUser.Id;
-        string roles = identityUser.Role ?? "[]";
-        List<string> listRole = JsonConvert.DeserializeObject<List<string>>(roles) ?? new List<string>();
-
-        var userRoles = await _userRoleService.GetAll(userId, listRole);
+        var roles = identityUser.Role ?? "";
+        
+        string finalCode = identityUser.CompanyCode;
+        
+        // If SuperAdmin, allow overriding companyCode
+        if (roles.Contains("SuperAdmin"))
+        {
+            if (!string.IsNullOrEmpty(companyCode))
+                finalCode = companyCode;
+            else
+                finalCode = null; // Show all if no filter
+        }
+        else
+        {
+            // Regular admin sees only their company
+            finalCode = identityUser.CompanyCode;
+        }
+        
+        var userRoles = await _userRoleService.GetAll(finalCode);
 
         return Ok(new BaseResponseModel
         {
@@ -81,16 +95,44 @@ public class UserRolesController : ControllerBase
             return BadRequest(new { msg = ResultErrorConstants.MODEL_MISS });
         }
         var identityUser = HttpContext.GetIdentityUser();
+        var roles = identityUser.Role ?? "";
 
         int userId = identityUser.Id;
         
         if (userRole.Id > 0)
         {
-            userRole = await _userRoleService.Update(userRole);
+            var existing = await _userRoleService.GetById(userRole.Id);
+            if (existing != null) 
+            {
+                // Preserve existing critical fields if not sent or needed
+                existing.Title = userRole.Title;
+                existing.Note = userRole.Note;
+                existing.ParentId = userRole.ParentId; // Allow updating parent
+                
+                // Only SuperAdmin can change CompanyCode, or leave as is
+                if (roles.Contains("SuperAdmin") && !string.IsNullOrEmpty(userRole.CompanyCode))
+                {
+                    existing.CompanyCode = userRole.CompanyCode;
+                }
+                
+                userRole = await _userRoleService.Update(existing);
+            }
         }
         else
         {
             userRole.UserCreated = userId;
+            
+            // If SuperAdmin provides a CompanyCode, use it. Otherwise use their own (which might be null/global).
+            if (roles.Contains("SuperAdmin") && !string.IsNullOrEmpty(userRole.CompanyCode))
+            {
+                 // userRole.CompanyCode is already set from Body
+            }
+            else
+            {
+                 // Default to creator's company if not enforcing specific one
+                 userRole.CompanyCode = identityUser.CompanyCode; 
+            }
+
             userRole = await _userRoleService.Create(userRole);
         }
         return Ok(userRole);

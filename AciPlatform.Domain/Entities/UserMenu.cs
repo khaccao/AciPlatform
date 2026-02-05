@@ -20,6 +20,7 @@ public class UserMenu
     public bool Add { get; set; } = false;
     public bool Edit { get; set; } = false;
     public bool Delete { get; set; } = false;
+    public bool Approve { get; set; } = false;
 
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     public int? CreatedBy { get; set; }

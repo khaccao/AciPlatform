@@ -120,6 +120,8 @@ public class CreateUserRequest
     [JsonPropertyName("address")]
     [JsonProperty("address")]
     public string? Address { get; set; }
+
+    public string? CompanyCode { get; set; }
 }
 
 

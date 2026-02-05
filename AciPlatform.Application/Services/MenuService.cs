@@ -60,7 +60,27 @@ public class MenuService : IMenuService
             .Select(r => r.Code)
             .ToListAsync();
 
-        // Check for UserMenu assignments (higher priority)
+        // Check for SuperAdmin (highest priority)
+        if (roleCodes.Contains(SuperAdminRoleCode))
+        {
+            var allMenus = await _context.Menus.OrderBy(x => x.Order).ToListAsync();
+            return allMenus.Select(menu => new MenuPermissionDto
+            {
+                Id = menu.Id,
+                MenuCode = menu.Code,
+                Name = menu.Name,
+                NameEN = menu.NameEN,
+                NameKO = menu.NameKO,
+                Order = menu.Order,
+                View = true,
+                Add = true,
+                Edit = true,
+                Delete = true,
+                Approve = true
+            }).ToList();
+        }
+
+        // Check for UserMenu assignments
         var userMenus = await _context.UserMenus
             .Where(um => um.UserId == userId)
             .Include(um => um.Menu)
@@ -80,27 +100,9 @@ public class MenuService : IMenuService
                 View = um.View,
                 Add = um.Add,
                 Edit = um.Edit,
-                Delete = um.Delete
+                Delete = um.Delete,
+                Approve = um.Approve
             }).OrderBy(m => m.Order).ToList();
-        }
-
-        // Fall back to role-based permissions
-        if (roleCodes.Contains(SuperAdminRoleCode))
-        {
-            var allMenus = await _context.Menus.OrderBy(x => x.Order).ToListAsync();
-            return allMenus.Select(menu => new MenuPermissionDto
-            {
-                Id = menu.Id,
-                MenuCode = menu.Code,
-                Name = menu.Name,
-                NameEN = menu.NameEN,
-                NameKO = menu.NameKO,
-                Order = menu.Order,
-                View = true,
-                Add = true,
-                Edit = true,
-                Delete = true
-            }).ToList();
         }
 
         var menuRoles = await _context.MenuRoles
@@ -129,7 +131,8 @@ public class MenuService : IMenuService
                     View = g.Any(x => x.View == true),
                     Add = g.Any(x => x.Add == true),
                     Edit = g.Any(x => x.Edit == true),
-                    Delete = g.Any(x => x.Delete == true)
+                    Delete = g.Any(x => x.Delete == true),
+                    Approve = g.Any(x => x.Approve == true)
                 });
 
         foreach (var menu in menus)
@@ -142,6 +145,41 @@ public class MenuService : IMenuService
                 permission.NameKO = menu.NameKO;
                 permission.Order = menu.Order;
             }
+        }
+
+        // Logic to auto-include Parent Menus
+        var authorizedMenuCodes = menuPermissions.Values.Select(p => p.MenuCode).ToHashSet();
+        var authorizedMenuParents = menus.Where(m => authorizedMenuCodes.Contains(m.Code)).Select(m => m.CodeParent).Distinct().ToList();
+
+        // Find parents that are not yet in the authorized list
+        var missingParents = await _context.Menus
+            .Where(m => authorizedMenuParents.Contains(m.Code) && !authorizedMenuCodes.Contains(m.Code))
+            .ToListAsync();
+            
+        // Add permissions for missing parents (View only)
+        foreach (var parent in missingParents)
+        {
+             if (!menuPermissions.ContainsKey(parent.Id))
+             {
+                 menuPermissions[parent.Id] = new MenuPermissionDto
+                 {
+                     Id = parent.Id,
+                     MenuCode = parent.Code,
+                     Name = parent.Name,
+                     NameEN = parent.NameEN,
+                     NameKO = parent.NameKO,
+                     Order = parent.Order,
+                     View = true, // Force View for parent
+                     Add = false,
+                     Edit = false,
+                     Delete = false,
+                     Approve = false
+                 };
+                 // Also add to the list for final processing if needed, 
+                 // though we are iterating 'menus' below which needs to include these new ones if we want them sorted correctly.
+                 // Better approach: Add to 'menus' list so the final sorting loop works.
+                 menus.Add(parent);
+             }
         }
 
         return menuPermissions.Values
@@ -172,7 +210,8 @@ public class MenuService : IMenuService
                 View = true,
                 Add = true,
                 Edit = true,
-                Delete = true
+                Delete = true,
+                Approve = true
             };
         }
 
@@ -196,7 +235,8 @@ public class MenuService : IMenuService
             View = menuRoles.Any(x => x.View == true),
             Add = menuRoles.Any(x => x.Add == true),
             Edit = menuRoles.Any(x => x.Edit == true),
-            Delete = menuRoles.Any(x => x.Delete == true)
+            Delete = menuRoles.Any(x => x.Delete == true),
+            Approve = menuRoles.Any(x => x.Approve == true)
         };
     }
 

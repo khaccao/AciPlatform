@@ -64,6 +64,8 @@ builder.Services.AddScoped<ITimeKeepingService, TimeKeepingService>();
 builder.Services.AddScoped<IUserCompanyService, UserCompanyService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IUserMenuService, UserMenuService>();
+builder.Services.AddScoped<IMenuRoleService, MenuRoleService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
 
 // Configure DbContext with Dynamic Connection String
 builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
@@ -71,6 +73,8 @@ builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
     var connectionStringProvider = sp.GetRequiredService<IConnectionStringProvider>();
     var connectionString = connectionStringProvider.GetConnectionString();
     options.UseSqlServer(connectionString);
+    // Ignore pending model changes warning in development
+    options.ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
 });
 
 // Register IApplicationDbContext (Scoped)
@@ -78,7 +82,7 @@ builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequir
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var key = Encoding.ASCII.GetBytes(jwtSettings["Secret"] ?? "SuperSecretKeyDefault123!");
+var key = Encoding.UTF8.GetBytes(jwtSettings["Secret"] ?? "SuperSecretKeyDefault123!");
 
 builder.Services.AddAuthentication(options =>
 {

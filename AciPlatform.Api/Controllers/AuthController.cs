@@ -111,7 +111,14 @@ public class AuthController : ControllerBase
                 .Select(x => x.Code)
                 .ToList();
 
-            var tokenString = _tokenService.GenerateToken(user, roles); // TokenService needs to accept User (not UserAuthDto) or I map it. 
+            var userCompanyCode = model.CompanyCode;
+            if (string.IsNullOrEmpty(userCompanyCode))
+            {
+                var companyCodes = await _userCompanyService.GetCompanyCodesByUsername(user.Username);
+                userCompanyCode = companyCodes.FirstOrDefault() ?? "";
+            }
+
+            var tokenString = _tokenService.GenerateToken(user, roles, userCompanyCode);
             // checkUser is UserAuthDto. user is User. 
             // _tokenService.GenerateToken(user, roles) uses User entity. 
             // Note: CodeMau Authenticate returned UserMapper.Auth (UserAuthDto). 
@@ -146,6 +153,7 @@ public class AuthController : ControllerBase
                     Menus = menus,
                     UserRoleIds = user.UserRoleIds,
                     YearCurrent = user.YearCurrent,
+                    CompanyCode = userCompanyCode,
                     IsDark = false, 
                     Theme = "",
                 },
@@ -277,7 +285,10 @@ public class AuthController : ControllerBase
             .Select(x => x.Code)
             .ToList();
 
-        var newAccessToken = _tokenService.GenerateToken(user, roles);
+        var companyCodes = await _userCompanyService.GetCompanyCodesByUsername(user.Username);
+        var userCompanyCode = companyCodes.FirstOrDefault() ?? "";
+
+        var newAccessToken = _tokenService.GenerateToken(user, roles, userCompanyCode);
         
         // Revoke old refresh token and create new one
         await _refreshTokenService.RevokeAsync(rt);
@@ -421,8 +432,14 @@ public class AuthController : ControllerBase
             // 3. Seed Menus
             if (!(await _menuService.GetAll()).Any())
             {
-                await _menuService.Create(new Menu { Code = "users", Name = "User Management", Order = 1 });
-                await _menuService.Create(new Menu { Code = "menus", Name = "Menu Management", Order = 2 });
+                await _menuService.Create(new Menu { Code = "hr", Name = "Nhân sự", Order = 1, IsParent = true });
+                await _menuService.Create(new Menu { Code = "hr/employees", Name = "Nhân viên", Order = 1, CodeParent = "hr" });
+                await _menuService.Create(new Menu { Code = "hr/organization", Name = "Tổ chức", Order = 2, CodeParent = "hr" });
+                
+                await _menuService.Create(new Menu { Code = "system", Name = "Hệ thống", Order = 10, IsParent = true });
+                await _menuService.Create(new Menu { Code = "system/roles", Name = "Phân quyền", Order = 1, CodeParent = "system" });
+                
+                await _menuService.Create(new Menu { Code = "menus", Name = "Quản lý Menu", Order = 11 });
             }
 
             // Verify user was created correctly

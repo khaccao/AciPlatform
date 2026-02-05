@@ -1,4 +1,5 @@
 using AciPlatform.Application.Interfaces;
+using AciPlatform.Application.Interfaces.HoSoNhanSu;
 using AciPlatform.Application.Helpers;
 using AciPlatform.Application.DTOs;
 using AciPlatform.Domain.Entities;
@@ -16,10 +17,12 @@ namespace AciPlatform.Api.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly IUserCompanyService _userCompanyService;
 
-    public UsersController(IUserService userService)
+    public UsersController(IUserService userService, IUserCompanyService userCompanyService)
     {
         _userService = userService;
+        _userCompanyService = userCompanyService;
     }
 
     [HttpGet]
@@ -27,10 +30,12 @@ public class UsersController : ControllerBase
     {
         string roles = "[]";
         int userId = 0;
+        string userCompanyCode = "";
         if (HttpContext.User.Identity is ClaimsIdentity identity)
         {
             roles = identity.FindFirst(x => x.Type == "RoleName")?.Value?.ToString() ?? "[]";
             userId = int.Parse(identity.FindFirst(x => x.Type == "UserId")?.Value ?? "0");
+            userCompanyCode = identity.FindFirst(x => x.Type == "CompanyCode")?.Value ?? "";
         }
         
         List<string> listRole = JsonConvert.DeserializeObject<List<string>>(roles) ?? new List<string>();
@@ -55,7 +60,8 @@ public class UsersController : ControllerBase
             CertificateId = param.Certificateid ?? 0,
             Ids = param.Ids,
             roles = listRole,
-            UserId = userId
+            UserId = userId,
+            CompanyCode = listRole.Contains("SuperAdmin") ? param.CompanyCode : userCompanyCode
         }));
     }
 
@@ -92,6 +98,16 @@ public class UsersController : ControllerBase
         user.Address = model.Address;
 
         await _userService.Update(user, model.Password);
+
+        // Update company assignment
+        if (!string.IsNullOrEmpty(model.CompanyCode))
+        {
+            if (!await _userCompanyService.ExistsAsync(user.Id, model.CompanyCode))
+            {
+                await _userCompanyService.CreateAsync(user.Id, model.CompanyCode);
+            }
+        }
+
         return Ok(new { message = "User updated successfully" });
     }
 
@@ -115,6 +131,13 @@ public class UsersController : ControllerBase
         };
 
         var createdUser = await _userService.Create(user, model.Password ?? "123456");
+
+        // Assign company
+        if (!string.IsNullOrEmpty(model.CompanyCode))
+        {
+            await _userCompanyService.CreateAsync(createdUser.Id, model.CompanyCode);
+        }
+
         return Ok(new { message = "User created successfully", userId = createdUser.Id });
     }
 

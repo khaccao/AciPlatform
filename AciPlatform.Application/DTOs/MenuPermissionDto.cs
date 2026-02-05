@@ -12,4 +12,5 @@ public class MenuPermissionDto
     public bool Add { get; set; }
     public bool Edit { get; set; }
     public bool Delete { get; set; }
+    public bool Approve { get; set; }
 }

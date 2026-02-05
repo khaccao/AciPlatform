@@ -24,4 +24,9 @@ public class UserRole
     public int? UserCreated { get; set; }
 
     public bool? IsNotAllowDelete { get; set; } = false;
+
+    [MaxLength(50)]
+    public string? CompanyCode { get; set; }
+    
+    public int? ParentId { get; set; }
 }
