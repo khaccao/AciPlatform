@@ -101,9 +101,6 @@ public class UserService : IUserService
         user.UserRoleIds = userParam.UserRoleIds;
         user.BranchId = userParam.BranchId;
         user.DepartmentId = userParam.DepartmentId;
-        user.PositionDetailId = userParam.PositionDetailId;
-        user.Gender = userParam.Gender;
-        user.BirthDay = userParam.BirthDay;
         user.Address = userParam.Address;
         user.RequestPassword = userParam.RequestPassword;
         user.UpdatedDate = DateTime.Now;
@@ -214,36 +211,6 @@ public class UserService : IUserService
         if (!string.IsNullOrEmpty(filterParams.Keyword))
             query = query.Where(x => x.Username.Contains(filterParams.Keyword) || (x.FullName != null && x.FullName.Contains(filterParams.Keyword)));
 
-        // Multi-tenancy filtering
-        if (!filterParams.roles.Contains("SuperAdmin"))
-        {
-            // If not SuperAdmin, must filter by CompanyCode
-            var companyCode = filterParams.CompanyCode;
-            if (string.IsNullOrEmpty(companyCode))
-            {
-                // Safety: if no company code in token for non-superadmin, return empty
-                return new { TotalItems = 0, Data = new List<object>(), PageSize = filterParams.PageSize, CurrentPage = filterParams.CurrentPage };
-            }
-            
-            // Join with UserCompanies to filter
-            query = from u in query
-                    join uc in _context.UserCompanies on u.Id equals uc.UserId
-                    where uc.CompanyCode == companyCode
-                    select u;
-        }
-        else if (!string.IsNullOrEmpty(filterParams.Keyword) || !string.IsNullOrEmpty(filterParams.CompanyCode))
-        {
-            // For SuperAdmin, if they provide a CompanyCode (e.g. from a filter UI), we filter.
-            // But we don't force it from their token.
-            if (!string.IsNullOrEmpty(filterParams.CompanyCode))
-            {
-                query = from u in query
-                        join uc in _context.UserCompanies on u.Id equals uc.UserId
-                        where uc.CompanyCode == filterParams.CompanyCode
-                        select u;
-            }
-        }
-
         if (filterParams.Gender.HasValue)
             query = query.Where(x => x.Gender == filterParams.Gender);
 
@@ -254,33 +221,7 @@ public class UserService : IUserService
             query = query.Where(x => filterParams.Ids.Contains(x.Id));
 
         var totalItems = await query.CountAsync();
-        
-        var users = await (from u in query
-                          join d in _context.Departments on u.DepartmentId equals d.Id into deptJoin
-                          from dept in deptJoin.DefaultIfEmpty()
-                          join p in _context.PositionDetails on u.PositionDetailId equals p.Id into posJoin
-                          from pos in posJoin.DefaultIfEmpty()
-                          select new {
-                              u.Id,
-                              u.Username,
-                              u.FullName,
-                              u.Email,
-                              u.Phone,
-                              u.UserRoleIds,
-                              u.DepartmentId,
-                              u.PositionDetailId,
-                              u.BirthDay,
-                              u.Gender,
-                              u.Address,
-                              Avatar = u.Avatar,
-                              u.Status,
-                              u.CreatedDate,
-                              DepartmentName = dept != null ? dept.Name : string.Empty,
-                              PositionName = pos != null ? pos.Name : string.Empty,
-                              CompanyCode = (from uc in _context.UserCompanies 
-                                            where uc.UserId == u.Id 
-                                            select uc.CompanyCode).FirstOrDefault()
-                          })
+        var users = await query
             .OrderByDescending(x => x.CreatedDate)
             .Skip((filterParams.CurrentPage - 1) * filterParams.PageSize)
             .Take(filterParams.PageSize)

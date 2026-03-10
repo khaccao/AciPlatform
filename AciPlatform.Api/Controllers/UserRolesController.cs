@@ -47,7 +47,7 @@ public class UserRolesController : ControllerBase
         var identityUser = HttpContext.GetIdentityUser();
         var roles = identityUser.Role ?? "";
         
-        string finalCode = identityUser.CompanyCode;
+        string? finalCode = identityUser.CompanyCode;
         
         // If SuperAdmin, allow overriding companyCode
         if (roles.Contains("SuperAdmin"))

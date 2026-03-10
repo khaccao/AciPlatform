@@ -1274,8 +1274,7 @@ namespace AciPlatform.Infrastructure.Migrations
 
                     b.HasIndex("MenuId");
 
-                    b.HasIndex("UserId", "MenuId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("UserMenus");
                 });

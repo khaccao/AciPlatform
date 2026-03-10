@@ -1,6 +1,5 @@
 using AciPlatform.Application.Interfaces;
 using AciPlatform.Domain.Entities;
-using AciPlatform.Domain.Entities.MultiChannel;
 using AciPlatform.Domain.Entities.HoSoNhanSu;
 using AciPlatform.Domain.Entities.LuongPhucLoi;
 using AciPlatform.Domain.Entities.HopDong;
@@ -39,14 +38,6 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<TimeKeepingEntry> TimeKeepingEntries { get; set; }
     public DbSet<UserCompany> UserCompanies { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
-    public DbSet<UserMenu> UserMenus { get; set; }
-    
-    // MultiChannel
-    public DbSet<FacebookAppConfig> FacebookAppConfigs { get; set; }
-    public DbSet<FacebookPage> FacebookPages { get; set; }
-    public DbSet<SocialPost> SocialPosts { get; set; }
-    public DbSet<AutomationWorkflow> AutomationWorkflows { get; set; }
-    public DbSet<AutomationLog> AutomationLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -121,27 +112,5 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Token).HasMaxLength(200);
             entity.HasIndex(e => e.Token).IsUnique();
         });
-
-        // Configure UserMenu entity
-        modelBuilder.Entity<UserMenu>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.HasIndex(e => new { e.UserId, e.MenuId }).IsUnique();
-
-            entity.HasOne(d => d.User)
-                  .WithMany()
-                  .HasForeignKey(d => d.UserId)
-                  .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasOne(d => d.Menu)
-                  .WithMany()
-                  .HasForeignKey(d => d.MenuId)
-                  .OnDelete(DeleteBehavior.Cascade);
-        });
-
-        // Configure Decimal precisions
-        modelBuilder.Entity<Allowance>().Property(p => p.Amount).HasPrecision(18, 2);
-        modelBuilder.Entity<AllowanceUser>().Property(p => p.AmountOverride).HasPrecision(18, 2);
-        modelBuilder.Entity<SalaryType>().Property(p => p.BaseAmount).HasPrecision(18, 2);
     }
 }

@@ -1,0 +1,1 @@
+// constants related to warehouse module

@@ -11,11 +11,11 @@ public class FacebookAppConfig
 
     [Required]
     [MaxLength(100)]
-    public string AppId { get; set; }
+    public string AppId { get; set; } = string.Empty;
 
     [Required]
     [MaxLength(200)]
-    public string AppSecret { get; set; }
+    public string AppSecret { get; set; } = string.Empty;
 
     public bool IsActive { get; set; } = true;
     
@@ -30,16 +30,16 @@ public class FacebookPage
 
     [Required]
     [MaxLength(100)]
-    public string PageId { get; set; }
+    public string PageId { get; set; } = string.Empty;
 
     [Required]
     [MaxLength(200)]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     [Required]
-    public string AccessToken { get; set; } // Page Access Token
+    public string AccessToken { get; set; } = string.Empty; // Page Access Token
 
-    public string UserAccessToken { get; set; } // Token of the user who connected
+    public string UserAccessToken { get; set; } = string.Empty; // Token of the user who connected
 
     public DateTime? TokenExpiresAt { get; set; }
 
@@ -60,7 +60,7 @@ public class SocialPost
     public int Id { get; set; }
 
     [Required]
-    public string Content { get; set; }
+    public string Content { get; set; } = string.Empty;
 
     public string? ImageUrls { get; set; } // Comma separated or JSON
 
@@ -94,13 +94,13 @@ public class AutomationWorkflow
 
     [Required]
     [MaxLength(200)]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
-    public string WorkflowJson { get; set; } // JSON structure of nodes and edges
+    public string WorkflowJson { get; set; } = string.Empty; // JSON structure of nodes and edges
 
     public bool IsActive { get; set; }
 
-    public string TriggerType { get; set; } // "Time", "Event"
+    public string TriggerType { get; set; } = string.Empty; // "Time", "Event"
 
     public int CreatedByUserId { get; set; }
 
@@ -116,11 +116,11 @@ public class AutomationLog
     public int WorkflowId { get; set; }
 
     [ForeignKey("WorkflowId")]
-    public virtual AutomationWorkflow Workflow { get; set; }
+    public virtual AutomationWorkflow Workflow { get; set; } = null!;
 
-    public string Status { get; set; } // "Success", "Failed"
+    public string Status { get; set; } = string.Empty; // "Success", "Failed"
 
-    public string Message { get; set; }
+    public string Message { get; set; } = string.Empty;
 
     public DateTime ExecutedAt { get; set; } = DateTime.UtcNow;
 }

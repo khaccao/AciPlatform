@@ -1,5 +1,4 @@
 using AciPlatform.Application.Interfaces;
-using AciPlatform.Application.Interfaces.HoSoNhanSu;
 using AciPlatform.Application.Helpers;
 using AciPlatform.Application.DTOs;
 using AciPlatform.Domain.Entities;
@@ -17,12 +16,10 @@ namespace AciPlatform.Api.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
-    private readonly IUserCompanyService _userCompanyService;
 
-    public UsersController(IUserService userService, IUserCompanyService userCompanyService)
+    public UsersController(IUserService userService)
     {
         _userService = userService;
-        _userCompanyService = userCompanyService;
     }
 
     [HttpGet]
@@ -30,12 +27,10 @@ public class UsersController : ControllerBase
     {
         string roles = "[]";
         int userId = 0;
-        string userCompanyCode = "";
         if (HttpContext.User.Identity is ClaimsIdentity identity)
         {
             roles = identity.FindFirst(x => x.Type == "RoleName")?.Value?.ToString() ?? "[]";
             userId = int.Parse(identity.FindFirst(x => x.Type == "UserId")?.Value ?? "0");
-            userCompanyCode = identity.FindFirst(x => x.Type == "CompanyCode")?.Value ?? "";
         }
         
         List<string> listRole = JsonConvert.DeserializeObject<List<string>>(roles) ?? new List<string>();
@@ -45,9 +40,9 @@ public class UsersController : ControllerBase
             BirthDay = param.Birthday,
             Gender = param.Gender,
             Keyword = param.SearchText,
-            PositionId = param.PositionId,
+            PositionId = param.Positionid,
             WarehouseId = param.Warehouseid,
-            DepartmentId = param.DepartmentId,
+            DepartmentId = param.Departmentid,
             RequestPassword = param.RequestPassword,
             Quit = param.Quit,
             CurrentPage = param.Page,
@@ -60,8 +55,7 @@ public class UsersController : ControllerBase
             CertificateId = param.Certificateid ?? 0,
             Ids = param.Ids,
             roles = listRole,
-            UserId = userId,
-            CompanyCode = listRole.Contains("SuperAdmin") ? param.CompanyCode : userCompanyCode
+            UserId = userId
         }));
     }
 
@@ -91,23 +85,8 @@ public class UsersController : ControllerBase
         user.Email = model.Email;
         user.Phone = model.Phone;
         user.UserRoleIds = model.UserRoleIds;
-        user.DepartmentId = model.DepartmentId;
-        user.PositionDetailId = model.PositionDetailId;
-        user.Gender = model.Gender;
-        user.BirthDay = model.BirthDay;
-        user.Address = model.Address;
 
         await _userService.Update(user, model.Password);
-
-        // Update company assignment
-        if (!string.IsNullOrEmpty(model.CompanyCode))
-        {
-            if (!await _userCompanyService.ExistsAsync(user.Id, model.CompanyCode))
-            {
-                await _userCompanyService.CreateAsync(user.Id, model.CompanyCode);
-            }
-        }
-
         return Ok(new { message = "User updated successfully" });
     }
 
@@ -121,23 +100,11 @@ public class UsersController : ControllerBase
             Email = model.Email,
             Phone = model.Phone,
             UserRoleIds = model.UserRoleIds,
-            DepartmentId = model.DepartmentId,
-            PositionDetailId = model.PositionDetailId,
-            Gender = model.Gender,
-            BirthDay = model.BirthDay,
-            Address = model.Address,
             CreatedDate = DateTime.Now,
             Status = 1
         };
 
         var createdUser = await _userService.Create(user, model.Password ?? "123456");
-
-        // Assign company
-        if (!string.IsNullOrEmpty(model.CompanyCode))
-        {
-            await _userCompanyService.CreateAsync(createdUser.Id, model.CompanyCode);
-        }
-
         return Ok(new { message = "User created successfully", userId = createdUser.Id });
     }
 

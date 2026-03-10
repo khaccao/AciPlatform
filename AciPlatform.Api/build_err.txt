@@ -1,0 +1,20 @@
+﻿  Determining projects to restore...
+  All projects are up-to-date for restore.
+  AciPlatform.Domain -> C:\Users\nguye\Expo\AciPlatform\AciPlatform.Domain\bin\Debug\net9.0\AciPlatform.Domain.dll
+  AciPlatform.Application -> C:\Users\nguye\Expo\AciPlatform\AciPlatform.Application\bin\Debug\net9.0\AciPlatform.Application.dll
+  AciPlatform.Infrastructure -> C:\Users\nguye\Expo\AciPlatform\AciPlatform.Infrastructure\bin\Debug\net9.0\AciPlatform.Infrastructure.dll
+C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\ModuleQLKho\Application\Services\GoodWarehousesService.cs(200,21): error CS1733: Expected expression [C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\AciPlatform.Api.csproj]
+C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\ModuleQLKho\Application\Services\GoodWarehousesService.cs(200,21): error CS1002: ; expected [C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\AciPlatform.Api.csproj]
+C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\ModuleQLKho\Application\Services\GoodWarehousesService.cs(200,21): error CS1513: } expected [C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\AciPlatform.Api.csproj]
+C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\ModuleQLKho\Application\Services\LedgerWareHouseService.cs(200,64): error CS1513: } expected [C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\AciPlatform.Api.csproj]
+
+Build FAILED.
+
+C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\ModuleQLKho\Application\Services\GoodWarehousesService.cs(200,21): error CS1733: Expected expression [C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\AciPlatform.Api.csproj]
+C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\ModuleQLKho\Application\Services\GoodWarehousesService.cs(200,21): error CS1002: ; expected [C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\AciPlatform.Api.csproj]
+C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\ModuleQLKho\Application\Services\GoodWarehousesService.cs(200,21): error CS1513: } expected [C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\AciPlatform.Api.csproj]
+C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\ModuleQLKho\Application\Services\LedgerWareHouseService.cs(200,64): error CS1513: } expected [C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\AciPlatform.Api.csproj]
+    0 Warning(s)
+    4 Error(s)
+
+Time Elapsed 00:00:04.95

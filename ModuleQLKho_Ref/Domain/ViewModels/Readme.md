@@ -1,0 +1,1 @@
+// view models for warehouse module
