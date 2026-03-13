@@ -5,6 +5,9 @@ using AciPlatform.Domain.Entities.LuongPhucLoi;
 using AciPlatform.Domain.Entities.HopDong;
 using AciPlatform.Domain.Entities.ChamCong;
 using AciPlatform.Domain.Entities.Auth;
+using AciPlatform.Domain.Entities.MultiChannel;
+using AciPlatform.Domain.Entities.QLKho;
+using AciPlatform.Domain.Entities.FleetTransportation;
 using Microsoft.EntityFrameworkCore;
 
 namespace AciPlatform.Infrastructure.Persistence;
@@ -38,6 +41,37 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<TimeKeepingEntry> TimeKeepingEntries { get; set; }
     public DbSet<UserCompany> UserCompanies { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<UserMenu> UserMenus { get; set; }
+
+    public DbSet<FacebookAppConfig> FacebookAppConfigs { get; set; }
+    public DbSet<FacebookPage> FacebookPages { get; set; }
+    public DbSet<SocialPost> SocialPosts { get; set; }
+    public DbSet<AutomationWorkflow> AutomationWorkflows { get; set; }
+    public DbSet<AutomationLog> AutomationLogs { get; set; }
+
+    public DbSet<Warehouse> Warehouses { get; set; }
+    public DbSet<WareHouseFloor> WareHouseFloors { get; set; }
+    public DbSet<WareHouseShelves> WareHouseShelves { get; set; }
+    public DbSet<WareHousePosition> WareHousePositions { get; set; }
+    public DbSet<Inventory> Inventories { get; set; }
+    public DbSet<WareHouseWithShelves> WareHouseWithShelves { get; set; }
+    public DbSet<WareHouseShelvesWithFloors> WareHouseShelvesWithFloors { get; set; }
+    public DbSet<WareHouseFloorWithPosition> WareHouseFloorWithPositions { get; set; }
+    public DbSet<GoodWarehouses> GoodWarehouses { get; set; }
+    public DbSet<GoodWarehousesPositions> GoodWarehousesPositions { get; set; }
+    public DbSet<GoodWarehouseExport> GoodWarehouseExports { get; set; }
+
+    public DbSet<Car> Cars { get; set; }
+    public DbSet<CarField> CarFields { get; set; }
+    public DbSet<CarFieldSetup> CarFieldSetups { get; set; }
+    public DbSet<CarLocation> CarLocations { get; set; }
+    public DbSet<CarLocationDetail> CarLocationDetails { get; set; }
+    public DbSet<DriverRouter> DriverRouters { get; set; }
+    public DbSet<DriverRouterDetail> DriverRouterDetails { get; set; }
+    public DbSet<PetrolConsumption> PetrolConsumptions { get; set; }
+    public DbSet<PetrolConsumptionPoliceCheckPoint> PetrolConsumptionPoliceCheckPoints { get; set; }
+    public DbSet<PoliceCheckPoint> PoliceCheckPoints { get; set; }
+    public DbSet<RoadRoute> RoadRoutes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -8,6 +8,9 @@ using AciPlatform.Application.Interfaces.LuongPhucLoi;
 using AciPlatform.Application.Interfaces.HopDong;
 using AciPlatform.Application.Interfaces.ChamCong;
 using AciPlatform.Application.Interfaces.HoSoNhanSu;
+using AciPlatform.Application.Interfaces.FleetTransportation;
+using AciPlatform.Application.Services.FleetTransportation;
+using AciPlatform.Api.Filters;
 using AciPlatform.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -50,6 +53,14 @@ builder.Services.AddScoped<IUserContractHistoryService, UserContractHistoryServi
 builder.Services.AddScoped<ITimeKeepingService, TimeKeepingService>();
 builder.Services.AddScoped<IUserCompanyService, UserCompanyService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+builder.Services.AddScoped<ICarService, CarService>();
+builder.Services.AddScoped<ICarFieldService, CarFieldService>();
+builder.Services.AddScoped<ICarLocationService, CarLocationService>();
+builder.Services.AddScoped<IDriverRouterService, DriverRouterService>();
+builder.Services.AddScoped<IPetrolConsumptionService, PetrolConsumptionService>();
+builder.Services.AddScoped<IPoliceCheckPointService, PoliceCheckPointService>();
+builder.Services.AddScoped<IRoadRouteService, RoadRouteService>();
+builder.Services.AddScoped<FleetExceptionFilter>();
 
 // Configure DbContext with Dynamic Connection String
 builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>

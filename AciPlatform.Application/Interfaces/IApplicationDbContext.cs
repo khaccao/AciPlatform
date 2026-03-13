@@ -6,6 +6,7 @@ using AciPlatform.Domain.Entities.ChamCong;
 using AciPlatform.Domain.Entities.Auth;
 using AciPlatform.Domain.Entities.MultiChannel;
 using AciPlatform.Domain.Entities.QLKho;
+using AciPlatform.Domain.Entities.FleetTransportation;
 using Microsoft.EntityFrameworkCore;
 
 namespace AciPlatform.Application.Interfaces;
@@ -56,6 +57,19 @@ public interface IApplicationDbContext
     DbSet<GoodWarehouses> GoodWarehouses { get; }
     DbSet<GoodWarehousesPositions> GoodWarehousesPositions { get; }
     DbSet<GoodWarehouseExport> GoodWarehouseExports { get; }
+
+    // FleetTransportation
+    DbSet<Car> Cars { get; }
+    DbSet<CarField> CarFields { get; }
+    DbSet<CarFieldSetup> CarFieldSetups { get; }
+    DbSet<CarLocation> CarLocations { get; }
+    DbSet<CarLocationDetail> CarLocationDetails { get; }
+    DbSet<DriverRouter> DriverRouters { get; }
+    DbSet<DriverRouterDetail> DriverRouterDetails { get; }
+    DbSet<PetrolConsumption> PetrolConsumptions { get; }
+    DbSet<PetrolConsumptionPoliceCheckPoint> PetrolConsumptionPoliceCheckPoints { get; }
+    DbSet<PoliceCheckPoint> PoliceCheckPoints { get; }
+    DbSet<RoadRoute> RoadRoutes { get; }
     
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
