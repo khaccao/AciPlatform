@@ -9,15 +9,13 @@ services:
     restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__DefaultConnection=Server=aciplatform-db,1433;Database=AciPlatform;User Id=sa;Password=${DB_SA_PASSWORD};TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
       - Jwt__Secret=${JWT_SECRET}
       - Jwt__Issuer=AciPlatform
       - Jwt__Audience=AciPlatformUsers
       - Jwt__ExpireHours=8
     networks:
       - aciplatform-network
-    depends_on:
-      - db
 
   aciplatform-frontend:
     build:
@@ -29,19 +27,6 @@ services:
     restart: unless-stopped
     networks:
       - aciplatform-network
-
-  db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: aciplatform-db
-    restart: unless-stopped
-    environment:
-      - SA_PASSWORD=${DB_SA_PASSWORD}
-      - ACCEPT_EULA=Y
-      - MSSQL_PID=Express
-    networks:
-      - aciplatform-network
-    volumes:
-      - db-data:/var/opt/mssql/data
 
   nginx:
     image: nginx:latest
@@ -66,4 +51,4 @@ networks:
     driver: bridge
 
 volumes:
-  db-data:
+  certbot-etc:
