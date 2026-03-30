@@ -59,6 +59,7 @@ public interface IApplicationDbContext
     DbSet<GoodWarehouseExport> GoodWarehouseExports { get; }
 
     // FleetTransportation
+    DbSet<CarFleet> CarFleets { get; }
     DbSet<Car> Cars { get; }
     DbSet<CarField> CarFields { get; }
     DbSet<CarFieldSetup> CarFieldSetups { get; }

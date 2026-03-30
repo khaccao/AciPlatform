@@ -10,4 +10,5 @@ public interface ITimeKeepingService
     Task<TimeKeepingEntry> CreateAsync(TimeKeepingEntryRequest request);
     Task UpdateAsync(int id, TimeKeepingEntryRequest request);
     Task DeleteAsync(int id);
+    Task<TimeKeepingEntry> ProcessFaceAttendanceAsync(FaceAttendanceRequest request);
 }

@@ -61,6 +61,7 @@ public class User
     public bool? Timekeeper { get; set; }
     public bool? RequestPassword { get; set; }
     public string? Avatar { get; set; }
+    public string? FaceImage { get; set; }
     public int? TargetId { get; set; }
     public int Status { get; set; } = 1;
     public string? Language { get; set; }

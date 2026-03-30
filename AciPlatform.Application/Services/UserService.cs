@@ -103,6 +103,7 @@ public class UserService : IUserService
         user.DepartmentId = userParam.DepartmentId;
         user.Address = userParam.Address;
         user.RequestPassword = userParam.RequestPassword;
+        user.FaceImage = userParam.FaceImage;
         user.UpdatedDate = DateTime.Now;
 
         if (!string.IsNullOrWhiteSpace(password))

@@ -239,3 +239,10 @@ public class TimeKeepingEntryResponse : TimeKeepingEntryRequest
 {
     public int Id { get; set; }
 }
+
+public class FaceAttendanceRequest
+{
+    public int UserId { get; set; }
+    public string CapturedImage { get; set; } = string.Empty; // Base64 string from client
+    public string? Note { get; set; }
+}

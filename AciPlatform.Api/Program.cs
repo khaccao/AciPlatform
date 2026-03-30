@@ -10,6 +10,8 @@ using AciPlatform.Application.Interfaces.ChamCong;
 using AciPlatform.Application.Interfaces.HoSoNhanSu;
 using AciPlatform.Application.Interfaces.FleetTransportation;
 using AciPlatform.Application.Services.FleetTransportation;
+using AciPlatform.Application.Interfaces.MultiChannel;
+using AciPlatform.Application.Services.MultiChannel;
 using AciPlatform.Api.Filters;
 using AciPlatform.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -23,6 +25,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor(); // Required for ConnectionStringProvider
 
 // Register Infrastructure Services
@@ -52,14 +55,19 @@ builder.Services.AddScoped<IContractFileService, ContractFileService>();
 builder.Services.AddScoped<IUserContractHistoryService, UserContractHistoryService>();
 builder.Services.AddScoped<ITimeKeepingService, TimeKeepingService>();
 builder.Services.AddScoped<IUserCompanyService, UserCompanyService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<ICarService, CarService>();
+builder.Services.AddScoped<ICarFleetService, CarFleetService>();
 builder.Services.AddScoped<ICarFieldService, CarFieldService>();
 builder.Services.AddScoped<ICarLocationService, CarLocationService>();
 builder.Services.AddScoped<IDriverRouterService, DriverRouterService>();
 builder.Services.AddScoped<IPetrolConsumptionService, PetrolConsumptionService>();
 builder.Services.AddScoped<IPoliceCheckPointService, PoliceCheckPointService>();
 builder.Services.AddScoped<IRoadRouteService, RoadRouteService>();
+builder.Services.AddScoped<IFacebookService, FacebookService>();
+builder.Services.AddScoped<IAIService, BasicAIService>();
+builder.Services.AddScoped<IAutomationService, AutomationService>();
 builder.Services.AddScoped<FleetExceptionFilter>();
 
 // Configure DbContext with Dynamic Connection String
@@ -124,7 +132,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"An error occurred migrating the DB: {ex.Message}");
+        Console.WriteLine($"An error occurred migrating the DB: {ex}");
     }
 }
 

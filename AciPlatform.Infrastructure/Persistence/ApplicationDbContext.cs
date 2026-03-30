@@ -61,6 +61,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<GoodWarehousesPositions> GoodWarehousesPositions { get; set; }
     public DbSet<GoodWarehouseExport> GoodWarehouseExports { get; set; }
 
+    public DbSet<CarFleet> CarFleets { get; set; }
     public DbSet<Car> Cars { get; set; }
     public DbSet<CarField> CarFields { get; set; }
     public DbSet<CarFieldSetup> CarFieldSetups { get; set; }

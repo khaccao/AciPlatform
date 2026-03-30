@@ -20,6 +20,11 @@ public class TimeKeepingEntry
     [MaxLength(255)]
     public string? Note { get; set; }
 
+    [MaxLength(50)]
+    public string? AttendanceMethod { get; set; } // "Face" or "Manual"
+
+    public string? CapturedImage { get; set; }
+
     public bool IsDeleted { get; set; } = false;
 
     public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;

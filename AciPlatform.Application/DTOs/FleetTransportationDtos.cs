@@ -8,7 +8,23 @@ public class CarModel
     public string? Content { get; set; }
     public double MileageAllowance { get; set; }
     public double FuelAmount { get; set; }
+    public int? CarFleetId { get; set; }
     public List<string>? Files { get; set; }
+}
+
+public class CarFleetModel
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? Description { get; set; }
+}
+
+public class CarFleetPagingModel
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? Description { get; set; }
+    public int CarCount { get; set; }
 }
 
 public class CarGetterModel
@@ -16,6 +32,7 @@ public class CarGetterModel
     public int Id { get; set; }
     public string? LicensePlates { get; set; }
     public string? Note { get; set; }
+    public int? CarFleetId { get; set; }
 }
 
 public class CarGetterPagingModel
@@ -25,6 +42,7 @@ public class CarGetterPagingModel
     public string? Note { get; set; }
     public double MileageAllowance { get; set; }
     public double FuelAmount { get; set; }
+    public int? CarFleetId { get; set; }
 }
 
 public class CarGetterDetailModel
@@ -35,6 +53,7 @@ public class CarGetterDetailModel
     public string? Content { get; set; }
     public double MileageAllowance { get; set; }
     public double FuelAmount { get; set; }
+    public int? CarFleetId { get; set; }
     public List<string>? Files { get; set; }
 }
 

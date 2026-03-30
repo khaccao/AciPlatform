@@ -24,6 +24,11 @@ public class Car
 
     public double FuelAmount { get; set; }
 
+    public int? CarFleetId { get; set; }
+
+    [ForeignKey("CarFleetId")]
+    public CarFleet? CarFleet { get; set; }
+
     public DateTime? CreatedDate { get; set; } = DateTime.Now;
 
     public DateTime? UpdatedDate { get; set; }

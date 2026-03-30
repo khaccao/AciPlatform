@@ -173,4 +173,19 @@ public class UsersController : ControllerBase
             Data = null,
         });
     }
+
+    [HttpPut("{id}/face-image")]
+    public async Task<IActionResult> UpdateFaceImage(int id, [FromBody] FaceImageUpdateModel model)
+    {
+        var user = await _userService.GetById(id);
+        if (user == null) return NotFound();
+        user.FaceImage = model.Image;
+        await _userService.Update(user);
+        return Ok(new { success = true });
+    }
+}
+
+public class FaceImageUpdateModel
+{
+    public string Image { get; set; } = string.Empty;
 }

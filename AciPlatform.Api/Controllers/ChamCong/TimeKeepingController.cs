@@ -52,4 +52,18 @@ public class TimeKeepingController : ControllerBase
         await _service.DeleteAsync(id);
         return Ok();
     }
+
+    [HttpPost("face-attendance")]
+    public async Task<IActionResult> ProcessFaceAttendance([FromBody] FaceAttendanceRequest request)
+    {
+        try
+        {
+            var item = await _service.ProcessFaceAttendanceAsync(request);
+            return Ok(new { success = true, data = item });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { success = false, message = ex.Message });
+        }
+    }
 }

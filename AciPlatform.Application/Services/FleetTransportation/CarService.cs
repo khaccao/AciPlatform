@@ -25,7 +25,8 @@ public class CarService : ICarService
             {
                 Id = x.Id,
                 LicensePlates = x.LicensePlates,
-                Note = x.Note
+                Note = x.Note,
+                CarFleetId = x.CarFleetId
             })
             .ToListAsync();
     }
@@ -49,7 +50,8 @@ public class CarService : ICarService
                 LicensePlates = x.LicensePlates,
                 Note = x.Note,
                 MileageAllowance = x.MileageAllowance,
-                FuelAmount = x.FuelAmount
+                FuelAmount = x.FuelAmount,
+                CarFleetId = x.CarFleetId
             })
             .ToListAsync();
 
@@ -71,6 +73,7 @@ public class CarService : ICarService
             Content = param.Content,
             MileageAllowance = param.MileageAllowance,
             FuelAmount = param.FuelAmount,
+            CarFleetId = param.CarFleetId,
             FileLink = SerializeFiles(param.Files),
             CreatedDate = DateTime.Now
         };
@@ -89,6 +92,7 @@ public class CarService : ICarService
         item.Content = param.Content;
         item.MileageAllowance = param.MileageAllowance;
         item.FuelAmount = param.FuelAmount;
+        item.CarFleetId = param.CarFleetId;
         item.FileLink = SerializeFiles(param.Files);
         item.UpdatedDate = DateTime.Now;
 
