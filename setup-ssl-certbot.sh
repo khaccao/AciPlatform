@@ -8,7 +8,7 @@ DOMAIN_API="sit.backend.nguyenbinh.info.vn"
 EMAIL="admin@nguyenbinh.info.vn"
 
 # 1. Start Nginx container to serve the .well-known challenge
-docker-compose up -d nginx
+docker compose up -d nginx
 
 # 2. Request certificates
 docker run -it --rm --name certbot \
@@ -19,4 +19,4 @@ docker run -it --rm --name certbot \
   -d $DOMAIN_MAIN -d $DOMAIN_WWW -d $DOMAIN_API
 
 # 3. Reload Nginx
-docker-compose exec nginx nginx -s reload
+docker compose exec nginx nginx -s reload
