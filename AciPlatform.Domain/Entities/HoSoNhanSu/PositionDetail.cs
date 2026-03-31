@@ -26,4 +26,7 @@ public class PositionDetail
     public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
 
     public DateTime? UpdatedDate { get; set; }
+
+    [MaxLength(50)]
+    public string? CompanyCode { get; set; }
 }

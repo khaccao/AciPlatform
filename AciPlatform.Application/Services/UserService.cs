@@ -101,6 +101,9 @@ public class UserService : IUserService
         user.UserRoleIds = userParam.UserRoleIds;
         user.BranchId = userParam.BranchId;
         user.DepartmentId = userParam.DepartmentId;
+        user.PositionDetailId = userParam.PositionDetailId;
+        user.Gender = userParam.Gender;
+        user.BirthDay = userParam.BirthDay;
         user.Address = userParam.Address;
         user.RequestPassword = userParam.RequestPassword;
         user.FaceImage = userParam.FaceImage;
@@ -207,26 +210,73 @@ public class UserService : IUserService
 
     public async Task<object> GetPaging(UserFilterParams filterParams)
     {
-        var query = _context.Users.Where(x => !x.IsDeleted);
+        var baseQuery = _context.Users.Where(x => !x.IsDeleted);
 
         if (!string.IsNullOrEmpty(filterParams.Keyword))
-            query = query.Where(x => x.Username.Contains(filterParams.Keyword) || (x.FullName != null && x.FullName.Contains(filterParams.Keyword)));
+            baseQuery = baseQuery.Where(x => x.Username.Contains(filterParams.Keyword) || (x.FullName != null && x.FullName.Contains(filterParams.Keyword)));
 
         if (filterParams.Gender.HasValue)
-            query = query.Where(x => x.Gender == filterParams.Gender);
+            baseQuery = baseQuery.Where(x => x.Gender == filterParams.Gender);
 
         if (filterParams.RequestPassword.HasValue)
-            query = query.Where(x => x.RequestPassword == filterParams.RequestPassword);
+            baseQuery = baseQuery.Where(x => x.RequestPassword == filterParams.RequestPassword);
 
         if (filterParams.Ids != null && filterParams.Ids.Any())
-            query = query.Where(x => filterParams.Ids.Contains(x.Id));
+            baseQuery = baseQuery.Where(x => filterParams.Ids.Contains(x.Id));
+
+        IQueryable<User> query = baseQuery;
+
+        // BẮT ĐẦU FIX LOGIC ADMINCOMPANY: DÙNG INNER JOIN ĐỂ CHỈ VIEW USER THUỘC COMPANY
+        // Nếu khác SuperAdmin và có mã công ty, chỉ truy xuất các nhân viên trong mã công ty đó.
+        if (filterParams.roles != null && !filterParams.roles.Contains("SuperAdmin") && !string.IsNullOrEmpty(filterParams.CompanyCode))
+        {
+            query = from u in baseQuery
+                    join uc in _context.UserCompanies on u.Id equals uc.UserId
+                    where uc.CompanyCode == filterParams.CompanyCode
+                    select u;
+            // distinct to avoid duplicates if users belong to the identical company multiple times
+            query = query.Distinct();
+        }
 
         var totalItems = await query.CountAsync();
-        var users = await query
-            .OrderByDescending(x => x.CreatedDate)
-            .Skip((filterParams.CurrentPage - 1) * filterParams.PageSize)
-            .Take(filterParams.PageSize)
-            .ToListAsync();
+
+        // Optimized pagination fetch
+        var pagedUserIds = await query.OrderByDescending(u => u.CreatedDate)
+                                      .Skip((filterParams.CurrentPage - 1) * filterParams.PageSize)
+                                      .Take(filterParams.PageSize)
+                                      .Select(u => u.Id)
+                                      .ToListAsync();
+
+        // Fetch exact user instances
+        var usersRaw = await _context.Users
+                                     .Where(u => pagedUserIds.Contains(u.Id))
+                                     .OrderByDescending(u => u.CreatedDate)
+                                     .ToListAsync();
+
+        // Fetch company codes bulk mapping to prevent EF N+1
+        var userCompanies = await _context.UserCompanies
+                                          .Where(uc => pagedUserIds.Contains(uc.UserId))
+                                          .ToListAsync();
+
+        // Map projection securely in memory
+        var users = usersRaw.Select(u => new
+        {
+            u.Id,
+            u.Username,
+            u.FullName,
+            u.Email,
+            u.Phone,
+            u.UserRoleIds,
+            u.DepartmentId,
+            u.PositionDetailId,
+            u.BirthDay,
+            u.Gender,
+            u.Address,
+            u.Status,
+            u.CreatedDate,
+            u.FaceImage,
+            CompanyCode = userCompanies.Where(c => c.UserId == u.Id).Select(c => c.CompanyCode).FirstOrDefault()
+        }).ToList();
 
         return new
         {

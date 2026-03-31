@@ -5,7 +5,7 @@ namespace AciPlatform.Application.Interfaces.HoSoNhanSu;
 
 public interface IDepartmentService
 {
-    Task<IEnumerable<Department>> GetAllAsync();
+    Task<IEnumerable<Department>> GetAllAsync(string? companyCode = null);
     Task<Department?> GetByIdAsync(int id);
     Task<Department> CreateAsync(DepartmentRequest request);
     Task UpdateAsync(int id, DepartmentRequest request);
@@ -14,7 +14,7 @@ public interface IDepartmentService
 
 public interface IPositionDetailService
 {
-    Task<IEnumerable<PositionDetail>> GetAllAsync();
+    Task<IEnumerable<PositionDetail>> GetAllAsync(string? companyCode = null);
     Task<PositionDetail?> GetByIdAsync(int id);
     Task<PositionDetail> CreateAsync(PositionDetailRequest request);
     Task UpdateAsync(int id, PositionDetailRequest request);

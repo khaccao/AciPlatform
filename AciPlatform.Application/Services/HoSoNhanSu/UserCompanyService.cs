@@ -34,4 +34,11 @@ public class UserCompanyService : IUserCompanyService
     {
         return await _context.UserCompanies.AnyAsync(x => x.UserId == userId && x.CompanyCode == companyCode);
     }
+
+    public async Task ClearAsync(int userId)
+    {
+        var entities = await _context.UserCompanies.Where(x => x.UserId == userId).ToListAsync();
+        _context.UserCompanies.RemoveRange(entities);
+        await _context.SaveChangesAsync();
+    }
 }

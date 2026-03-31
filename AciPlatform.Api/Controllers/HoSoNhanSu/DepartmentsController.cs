@@ -1,5 +1,6 @@
 using AciPlatform.Application.DTOs;
 using AciPlatform.Application.Interfaces.HoSoNhanSu;
+using AciPlatform.Application.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +21,11 @@ public class DepartmentsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var items = await _service.GetAllAsync();
+        var identityUser = HttpContext.GetIdentityUser();
+        var roles = identityUser.Role ?? "";
+        string? companyCode = roles.Contains("SuperAdmin") ? null : identityUser.CompanyCode;
+
+        var items = await _service.GetAllAsync(companyCode);
         return Ok(items);
     }
 
@@ -35,6 +40,14 @@ public class DepartmentsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] DepartmentRequest request)
     {
+        var identityUser = HttpContext.GetIdentityUser();
+        var roles = identityUser.Role ?? "";
+        
+        if (!roles.Contains("SuperAdmin") || string.IsNullOrEmpty(request.CompanyCode))
+        {
+            request.CompanyCode = identityUser.CompanyCode;
+        }
+
         var item = await _service.CreateAsync(request);
         return Ok(item);
     }

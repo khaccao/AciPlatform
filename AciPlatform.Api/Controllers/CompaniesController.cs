@@ -1,4 +1,5 @@
 using AciPlatform.Application.Interfaces.HoSoNhanSu;
+using AciPlatform.Application.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +20,16 @@ public class CompaniesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
+        var identityUser = HttpContext.GetIdentityUser();
+        var roles = identityUser.Role ?? "";
+        
         var companies = await _companyService.GetAllAsync();
+        
+        if (!roles.Contains("SuperAdmin") && !string.IsNullOrEmpty(identityUser.CompanyCode))
+        {
+            companies = companies.Where(c => c.Code == identityUser.CompanyCode).ToList();
+        }
+        
         return Ok(companies);
     }
 

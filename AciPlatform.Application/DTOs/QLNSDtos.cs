@@ -7,6 +7,7 @@ public class DepartmentRequest
     public string? Code { get; set; }
     public int? ParentId { get; set; }
     public int? Order { get; set; }
+    public string? CompanyCode { get; set; }
 }
 
 public class DepartmentResponse : DepartmentRequest
@@ -22,6 +23,7 @@ public class PositionDetailRequest
     public int? DepartmentId { get; set; }
     public string? Note { get; set; }
     public int? Order { get; set; }
+    public string? CompanyCode { get; set; }
 }
 
 public class PositionDetailResponse : PositionDetailRequest

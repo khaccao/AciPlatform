@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Security.Claims;
+using AciPlatform.Application.Interfaces.HoSoNhanSu;
 
 namespace AciPlatform.Api.Controllers;
 
@@ -16,10 +17,12 @@ namespace AciPlatform.Api.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly IUserCompanyService _userCompanyService;
 
-    public UsersController(IUserService userService)
+    public UsersController(IUserService userService, IUserCompanyService userCompanyService)
     {
         _userService = userService;
+        _userCompanyService = userCompanyService;
     }
 
     [HttpGet]
@@ -27,10 +30,12 @@ public class UsersController : ControllerBase
     {
         string roles = "[]";
         int userId = 0;
+        string? companyCodeFilter = null;
         if (HttpContext.User.Identity is ClaimsIdentity identity)
         {
             roles = identity.FindFirst(x => x.Type == "RoleName")?.Value?.ToString() ?? "[]";
             userId = int.Parse(identity.FindFirst(x => x.Type == "UserId")?.Value ?? "0");
+            companyCodeFilter = identity.FindFirst(x => x.Type == "CompanyCode")?.Value;
         }
         
         List<string> listRole = JsonConvert.DeserializeObject<List<string>>(roles) ?? new List<string>();
@@ -55,7 +60,8 @@ public class UsersController : ControllerBase
             CertificateId = param.Certificateid ?? 0,
             Ids = param.Ids,
             roles = listRole,
-            UserId = userId
+            UserId = userId,
+            CompanyCode = !string.IsNullOrEmpty(param.CompanyCode) ? param.CompanyCode : companyCodeFilter
         }));
     }
 
@@ -85,9 +91,33 @@ public class UsersController : ControllerBase
         user.Email = model.Email;
         user.Phone = model.Phone;
         user.UserRoleIds = model.UserRoleIds;
+        user.DepartmentId = model.DepartmentId;
+        user.PositionDetailId = model.PositionDetailId;
+        user.Gender = model.Gender;
+        user.BirthDay = model.BirthDay;
+        user.Address = model.Address;
 
-        await _userService.Update(user, model.Password);
-        return Ok(new { message = "User updated successfully" });
+        try
+        {
+            await _userService.Update(user, model.Password);
+
+            // Handle Company assignment
+            await _userCompanyService.ClearAsync(user.Id);
+            if (!string.IsNullOrEmpty(model.CompanyCode))
+            {
+                var companyCodes = model.CompanyCode.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                foreach (var code in companyCodes)
+                {
+                    await _userCompanyService.CreateAsync(user.Id, code.Trim());
+                }
+            }
+
+            return Ok(new { message = "User updated successfully" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpPost]
@@ -100,12 +130,36 @@ public class UsersController : ControllerBase
             Email = model.Email,
             Phone = model.Phone,
             UserRoleIds = model.UserRoleIds,
+            DepartmentId = model.DepartmentId,
+            PositionDetailId = model.PositionDetailId,
+            Gender = model.Gender,
+            BirthDay = model.BirthDay,
+            Address = model.Address,
             CreatedDate = DateTime.Now,
             Status = 1
         };
 
-        var createdUser = await _userService.Create(user, model.Password ?? "123456");
-        return Ok(new { message = "User created successfully", userId = createdUser.Id });
+        try
+        {
+            var defaultPassword = string.IsNullOrWhiteSpace(model.Password) ? "123456" : model.Password;
+            var createdUser = await _userService.Create(user, defaultPassword);
+
+            // Handle Company assignment
+            if (!string.IsNullOrEmpty(model.CompanyCode))
+            {
+                var companyCodes = model.CompanyCode.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                foreach (var code in companyCodes)
+                {
+                    await _userCompanyService.CreateAsync(createdUser.Id, code.Trim());
+                }
+            }
+
+            return Ok(new { message = "User created successfully", userId = createdUser.Id });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpDelete("{id}")]

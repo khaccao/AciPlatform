@@ -15,12 +15,14 @@ public class DepartmentService : IDepartmentService
         _context = context;
     }
 
-    public async Task<IEnumerable<Department>> GetAllAsync()
+    public async Task<IEnumerable<Department>> GetAllAsync(string? companyCode = null)
     {
-        return await _context.Departments
-            .Where(x => !x.IsDeleted)
-            .OrderBy(x => x.Order ?? x.Id)
-            .ToListAsync();
+        var query = _context.Departments.Where(x => !x.IsDeleted);
+        if (!string.IsNullOrEmpty(companyCode))
+        {
+            query = query.Where(x => x.CompanyCode == companyCode || x.CompanyCode == null);
+        }
+        return await query.OrderBy(x => x.Order ?? x.Id).ToListAsync();
     }
 
     public async Task<Department?> GetByIdAsync(int id)
@@ -36,6 +38,7 @@ public class DepartmentService : IDepartmentService
             Code = request.Code?.Trim(),
             ParentId = request.ParentId,
             Order = request.Order,
+            CompanyCode = request.CompanyCode,
             CreatedDate = DateTime.UtcNow
         };
         _context.Departments.Add(entity);
@@ -75,12 +78,14 @@ public class PositionDetailService : IPositionDetailService
         _context = context;
     }
 
-    public async Task<IEnumerable<PositionDetail>> GetAllAsync()
+    public async Task<IEnumerable<PositionDetail>> GetAllAsync(string? companyCode = null)
     {
-        return await _context.PositionDetails
-            .Where(x => !x.IsDeleted)
-            .OrderBy(x => x.Order ?? x.Id)
-            .ToListAsync();
+        var query = _context.PositionDetails.Where(x => !x.IsDeleted);
+        if (!string.IsNullOrEmpty(companyCode))
+        {
+            query = query.Where(x => x.CompanyCode == companyCode || x.CompanyCode == null);
+        }
+        return await query.OrderBy(x => x.Order ?? x.Id).ToListAsync();
     }
 
     public async Task<PositionDetail?> GetByIdAsync(int id)
@@ -97,6 +102,7 @@ public class PositionDetailService : IPositionDetailService
             DepartmentId = request.DepartmentId,
             Note = request.Note,
             Order = request.Order,
+            CompanyCode = request.CompanyCode,
             CreatedDate = DateTime.UtcNow
         };
         _context.PositionDetails.Add(entity);

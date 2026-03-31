@@ -35,6 +35,8 @@ builder.Services.AddScoped<IConnectionStringProvider, ConnectionStringProvider>(
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<IUserRoleService, UserRoleService>();
+builder.Services.AddScoped<IMenuRoleService, MenuRoleService>();
+builder.Services.AddScoped<IUserMenuService, UserMenuService>();
 builder.Services.AddScoped<IWebAuthService, WebAuthService>();
 builder.Services.AddScoped<IInvoiceAuthorize, InvoiceAuthorize>();
 builder.Services.AddScoped<ITokenService, TokenService>();
