@@ -64,3 +64,8 @@ coverage/
 
 # Artifacts
 artifacts/
+.gitnexus
+.gitignore
+agents.md
+claude.md
+skill.md

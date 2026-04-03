@@ -2679,6 +2679,353 @@ Sample JSON request:
 }
 ```
 
+---
+
+## Frontend Integration Guide (Customer + Sell Compatibility APIs)
+
+Updated: 2026-04-04
+
+This section is frontend-focused and documents the compatibility APIs that were added from legacy module patterns (ModuleCustomer + ModuleSell) into AciPlatform.
+
+### Environment
+
+- Base URL (local test): `http://localhost:5041`
+- Auth: Bearer JWT
+- Content type: `application/json`
+
+### Smoke Test Status (2026-04-04)
+
+- `GET /swagger/v1/swagger.json`: **200**
+- `POST /api/WebAuth/login` with invalid credentials: **401**
+- `GET /api/Customers` without token: **401**
+- `GET /api/Goods` without token: **401**
+- `GET /api/Order` without token: **401**
+- Authenticated flow (register -> login -> call protected APIs): verified successfully via server execution logs and DB query traces.
+
+## 1) Authentication Flow for Frontend
+
+### 1.1 Register test/customer account
+
+- Endpoint: `POST /api/WebAuth/register`
+- Auth: No
+
+Request body example:
+
+```json
+{
+    "name": "Frontend Test User",
+    "phone": "0912345678",
+    "password": "Test@123",
+    "email": "frontend.test@example.com",
+    "address": "HCM"
+}
+```
+
+Response body example:
+
+```json
+{
+    "status": 200,
+    "data": {
+        "id": 123,
+        "code": "CUS20260001",
+        "name": "Frontend Test User",
+        "avatar": null,
+        "phone": "0912345678",
+        "token": "<jwt-token>"
+    }
+}
+```
+
+### 1.2 Login
+
+- Endpoint: `POST /api/WebAuth/login`
+- Auth: No
+
+Request body example:
+
+```json
+{
+    "username": "0912345678",
+    "password": "Test@123"
+}
+```
+
+Success response includes token at `Token`.
+
+```json
+{
+    "id": 123,
+    "username": "CUS20260001",
+    "fullname": "Frontend Test User",
+    "token": "<jwt-token>",
+    "email": "frontend.test@example.com",
+    "phone": "0912345678"
+}
+```
+
+Use header for protected APIs:
+
+`Authorization: Bearer <jwt-token>`
+
+---
+
+## 2) Customers API (Compatibility)
+
+Controller route: `/api/Customers`
+
+### 2.1 Get paging list
+
+- `GET /api/Customers?page=1&pageSize=20&searchText=&code=&phone=&email=`
+- Auth: Yes
+
+Response shape:
+
+```json
+{
+    "currentPage": 1,
+    "pageSize": 20,
+    "totalItems": 100,
+    "data": [
+        {
+            "id": 1,
+            "code": "CUS20260001",
+            "name": "Nguyen Van A",
+            "phone": "0912345678",
+            "email": "a@example.com",
+            "address": "HCM",
+            "createdDate": "2026-04-04T08:00:00"
+        }
+    ]
+}
+```
+
+### 2.2 Get select list
+
+- `GET /api/Customers/list?searchText=nguyen`
+- Auth: Yes
+
+### 2.3 Get code-name list
+
+- `GET /api/Customers/list-code-name`
+- Auth: Yes
+
+### 2.4 Get customer detail
+
+- `GET /api/Customers/{id}`
+- Auth: Yes
+
+### 2.5 Create customer
+
+- `POST /api/Customers`
+- Auth: Yes
+
+Request body example:
+
+```json
+{
+    "code": "",
+    "name": "Le Thi B",
+    "phone": "0988111222",
+    "email": "b@example.com",
+    "address": "Ha Noi",
+    "provinceId": 1,
+    "districtId": 2,
+    "wardId": 3,
+    "gender": 1
+}
+```
+
+Notes:
+
+- If `code` is empty, backend auto-generates format `CUS{yyyy}{0001}`.
+- Phone is unique among non-deleted customers.
+
+### 2.6 Update customer
+
+- `PUT /api/Customers/{id}`
+- Auth: Yes
+
+### 2.7 Delete customer (soft delete)
+
+- `DELETE /api/Customers/{id}`
+- Auth: Yes
+
+### 2.8 Get generated customer code
+
+- `GET /api/Customers/get-code-customer`
+- Auth: Yes
+
+### 2.9 Get customer warnings
+
+- `GET /api/Customers/get-customer-warning`
+- Auth: Yes
+- Current warning rule: customer missing email.
+
+---
+
+## 3) Goods API (Compatibility)
+
+Controller route: `/api/Goods`
+
+Source data mapping: `GoodWarehouses` (QLKho)
+
+### 3.1 Get paging goods
+
+- `GET /api/Goods?page=1&pageSize=20&searchText=&goodType=&account=&detail1=&priceCode=&menuType=&warehouse=&goodCode=&status=0`
+- Auth: Yes
+
+Response shape:
+
+```json
+{
+    "data": [
+        {
+            "id": 1,
+            "menuType": "FOOD",
+            "account": "ACC01",
+            "accountName": "Account Name",
+            "warehouse": "WH01",
+            "warehouseName": "Main Warehouse",
+            "detail1": "SP001",
+            "detail2": "SP001A",
+            "detailName1": "San pham 1",
+            "detailName2": "San pham 1 - Bien the",
+            "goodsType": "NORMAL",
+            "quantity": 120,
+            "status": 1,
+            "goodCode": "SP001A",
+            "goodName": "San pham 1 - Bien the",
+            "qrCode": "SP001A 1-1"
+        }
+    ],
+    "totalItems": 1200,
+    "pageSize": 20,
+    "currentPage": 1
+}
+```
+
+### 3.2 Get simple goods list
+
+- `GET /api/Goods/list`
+- Auth: Yes
+
+### 3.3 Get goods detail by id
+
+- `GET /api/Goods/{id}`
+- Auth: Yes
+
+### 3.4 Goods report endpoint
+
+- `GET /api/Goods/report-good-in-warehouse` (same filter as 3.1)
+- Auth: Yes
+- Behavior: returns same data shape as paging goods.
+
+### 3.5 Sync account endpoint (compatibility)
+
+- `GET /api/Goods/SyncAccountGood`
+- Auth: Yes
+- Current behavior: accepts request and returns success payload for frontend flow compatibility.
+
+---
+
+## 4) Order API (Compatibility)
+
+Controller route: `/api/Order`
+
+Source data mapping: `GoodWarehouseExports` grouped by `BillId`
+
+### 4.1 Search orders
+
+- `GET /api/Order?page=1&pageSize=20&searchText=&billId=&fromDate=&toDate=`
+- Auth: Yes
+
+Response shape:
+
+```json
+{
+    "data": [
+        {
+            "billId": 12345,
+            "totalLineItems": 3,
+            "createdAt": "2026-04-03T09:30:00",
+            "isDeleted": false
+        }
+    ],
+    "totalItems": 50,
+    "pageSize": 20,
+    "currentPage": 1
+}
+```
+
+### 4.2 Get order detail
+
+- `GET /api/Order/{id}` where `id = BillId`
+- Auth: Yes
+
+Returns list line items:
+
+```json
+[
+    {
+        "exportId": 1,
+        "goodWarehouseId": 100,
+        "goodCode": "SP001A",
+        "goodName": "San pham 1 - Bien the",
+        "quantity": 5,
+        "createdAt": "2026-04-03T09:30:00"
+    }
+]
+```
+
+### 4.3 Update order soft-delete state
+
+- `PUT /api/Order/{id}`
+- Auth: Yes
+
+Request body example:
+
+```json
+{
+    "billId": 12345,
+    "isDeleted": true
+}
+```
+
+### 4.4 Notification orders
+
+- `GET /api/Order/notification-order`
+- Auth: Yes
+- Returns top newest bill groups created today.
+
+---
+
+## 5) Frontend Error Handling Contract
+
+### Common status codes
+
+- `200`: success
+- `400`: bad request / validation error
+- `401`: missing or invalid token
+- `404`: resource not found
+
+### Suggested axios/fetch interceptor behavior
+
+- If `401`: redirect login + clear local token.
+- If `400`: display backend `msg` or `message` when available.
+- If `404`: show empty state or not-found page depending on screen.
+
+---
+
+## 6) Quick Frontend Checklist
+
+1. Login/Register and persist JWT token.
+2. Attach `Authorization: Bearer <token>` on all protected APIs.
+3. Use paging params (`page`, `pageSize`) consistently.
+4. For orders, treat route id as `BillId` (not export row id).
+5. For customers, avoid duplicate phone when creating/updating.
+
+
 #### Responses
 
 | Status | Description | Content-Type | Schema |
