@@ -58,6 +58,7 @@ public class UsersController : ControllerBase
             Month = param.Month,
             DegreeId = param.Degreeid ?? 0,
             CertificateId = param.Certificateid ?? 0,
+            IsDeleted = param.IsDeleted,
             Ids = param.Ids,
             roles = listRole,
             UserId = userId,

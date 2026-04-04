@@ -22,6 +22,7 @@ public class UserViewModel
     public int? DepartmentId { get; set; }
     public bool? RequestPassword { get; set; }
     public bool? Quit { get; set; }
+    public bool? IsDeleted { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public int? Targetid { get; set; }
@@ -42,6 +43,7 @@ public class UserFilterParams
     public int? DepartmentId { get; set; }
     public bool? RequestPassword { get; set; }
     public bool? Quit { get; set; }
+    public bool? IsDeleted { get; set; }
     public int CurrentPage { get; set; } = 1;
     public int PageSize { get; set; } = 20;
     public DateTime? StartDate { get; set; }
