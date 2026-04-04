@@ -121,34 +121,34 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            $dir = "C:\aciplatform-api"
-            if (!(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force }
-            Set-Location $dir
+            DEPLOY_DIR="/root/aciplatform-api"
+            mkdir -p $DEPLOY_DIR
+            cd $DEPLOY_DIR || exit 1
             
             # 1. Update/Clone Code (Force cleanup if corrupted)
-            if (!(Test-Path .git)) {
-                Write-Host "Directory not a git repo, cleaning and cloning..."
-                Remove-Item -Path "*" -Recurse -Force -ErrorAction SilentlyContinue
+            if [ ! -d ".git" ]; then
+                echo "Directory not a git repo, cleaning and cloning..."
+                rm -rf *
                 git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/khaccao/AciPlatform.git .
-            } else {
+            else
                 git fetch origin
                 git reset --hard origin/staging
-            }
+            fi
             
             # 2. Setup .env
-            if (Test-Path .env.example) {
-                if (!(Test-Path .env)) {
-                    Copy-Item .env.example .env
-                    (Get-Content .env) -replace 'DOCKER_NAMESPACE=your-username', 'DOCKER_NAMESPACE=khaccao' | Set-Content .env
-                    (Get-Content .env) -replace 'DOCKER_IMAGE_TAG=latest', 'DOCKER_IMAGE_TAG=staging' | Set-Content .env
-                }
-            } else {
-                Write-Error "CRITICAL: .env.example not found after clone!"
+            if [ -f ".env.example" ]; then
+                if [ ! -f ".env" ]; then
+                    cp .env.example .env
+                    sed -i "s/DOCKER_NAMESPACE=your-username/DOCKER_NAMESPACE=khaccao/g" .env
+                    sed -i "s/DOCKER_IMAGE_TAG=latest/DOCKER_IMAGE_TAG=staging/g" .env
+                fi
+            else
+                echo "CRITICAL: .env.example not found after clone!"
                 exit 1
-            }
+            fi
             
             # 3. Docker Sync 
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker-compose pull
             
             # 4. Restart Services
@@ -156,7 +156,7 @@ jobs:
             docker-compose up -d
             
             # 5. Show Status
-            Start-Sleep -s 5
+            sleep 5
             docker ps
 
   notify:
