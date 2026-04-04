@@ -122,7 +122,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             set -e
-            DEPLOY_DIR="/root/aciplatform-api"
+            DEPLOY_DIR="/root/apps/AciPlatform"
             
             # 1. Update/Clone Code (Force cleanup if corrupted)
             if [ ! -d "$DEPLOY_DIR/.git" ]; then
@@ -144,7 +144,6 @@ jobs:
                 if [ ! -f ".env" ]; then
                     echo "Creating .env from .env.example..."
                     cp .env.example .env
-                    # Use double quotes for expansion in sed
                     sed -i "s/DOCKER_NAMESPACE=your-username/DOCKER_NAMESPACE=khaccao/g" .env
                     sed -i "s/DOCKER_IMAGE_TAG=latest/DOCKER_IMAGE_TAG=staging/g" .env
                 fi
