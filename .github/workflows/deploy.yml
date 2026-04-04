@@ -121,29 +121,36 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            set -e
             DEPLOY_DIR="/root/aciplatform-api"
-            mkdir -p $DEPLOY_DIR
-            cd $DEPLOY_DIR || exit 1
             
             # 1. Update/Clone Code (Force cleanup if corrupted)
-            if [ ! -d ".git" ]; then
-                echo "Directory not a git repo, cleaning and cloning..."
-                rm -rf *
-                git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/khaccao/AciPlatform.git .
+            if [ ! -d "$DEPLOY_DIR/.git" ]; then
+                echo "Directory not a git repo or doesn't exist, recreating..."
+                mkdir -p $DEPLOY_DIR
+                cd $DEPLOY_DIR
+                # Use find to wipe all hidden and regular files
+                find . -mindepth 1 -delete
+                git clone -b staging https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/khaccao/AciPlatform.git .
             else
-                git fetch origin
+                cd $DEPLOY_DIR
+                echo "Updating existing repo..."
+                git fetch origin staging
                 git reset --hard origin/staging
             fi
             
             # 2. Setup .env
             if [ -f ".env.example" ]; then
                 if [ ! -f ".env" ]; then
+                    echo "Creating .env from .env.example..."
                     cp .env.example .env
+                    # Use double quotes for expansion in sed
                     sed -i "s/DOCKER_NAMESPACE=your-username/DOCKER_NAMESPACE=khaccao/g" .env
                     sed -i "s/DOCKER_IMAGE_TAG=latest/DOCKER_IMAGE_TAG=staging/g" .env
                 fi
             else
-                echo "CRITICAL: .env.example not found after clone!"
+                echo "ERROR: .env.example not found in $(pwd)"
+                ls -la
                 exit 1
             fi
             
