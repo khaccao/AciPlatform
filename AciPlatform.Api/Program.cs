@@ -24,7 +24,22 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "AciPlatform API", Version = "v1" });
+    c.SwaggerDoc("customer", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Customer API", Version = "v1" });
+    
+    // Group controllers
+    c.DocInclusionPredicate((docName, apiDesc) =>
+    {
+        if (docName == "customer")
+        {
+            var controllerName = apiDesc.ActionDescriptor.RouteValues["controller"];
+            return controllerName == "Customers" || controllerName == "Auth";
+        }
+        return docName == "v1";
+    });
+});
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor(); // Required for ConnectionStringProvider
 
@@ -112,7 +127,8 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "AciPlatform API v1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Full API v1");
+    c.SwaggerEndpoint("/swagger/customer/swagger.json", "Customer API v1");
     c.RoutePrefix = "swagger";
 });
 
