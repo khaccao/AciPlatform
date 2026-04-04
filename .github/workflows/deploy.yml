@@ -159,7 +159,7 @@ jobs:
             
             # 4. Restart Services
             docker compose down
-            docker compose up -d
+            docker compose up -d --build
             
             # 5. Show Status
             sleep 5
