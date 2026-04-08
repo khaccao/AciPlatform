@@ -123,23 +123,36 @@ jobs:
           script: |
             set -e
             DEPLOY_DIR="/root/apps/AciPlatform"
+            FRONTEND_DIR="/root/apps/AciPlatform_Frontend"
             
-            # 1. Update/Clone Code (Force cleanup if corrupted)
+            # 1. Update/Clone Backend Code
             if [ ! -d "$DEPLOY_DIR/.git" ]; then
-                echo "Directory not a git repo or doesn't exist, recreating..."
+                echo "Backend directory not found, cloning..."
                 mkdir -p $DEPLOY_DIR
                 cd $DEPLOY_DIR
-                # Use find to wipe all hidden and regular files
-                find . -mindepth 1 -delete
                 git clone -b staging https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/khaccao/AciPlatform.git .
             else
                 cd $DEPLOY_DIR
-                echo "Updating existing repo..."
+                echo "Updating Backend..."
                 git fetch origin staging
                 git reset --hard origin/staging
             fi
             
-            # 2. Setup .env
+            # 2. Update/Clone Frontend Code
+            if [ ! -d "$FRONTEND_DIR/.git" ]; then
+                echo "Frontend directory not found, cloning..."
+                mkdir -p $FRONTEND_DIR
+                cd $FRONTEND_DIR
+                git clone -b staging https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/khaccao/AciPlatform_Frontend.git .
+            else
+                cd $FRONTEND_DIR
+                echo "Updating Frontend..."
+                git fetch origin staging
+                git reset --hard origin/staging
+            fi
+            
+            # 3. Setup .env in Backend Dir
+            cd $DEPLOY_DIR
             if [ -f ".env.example" ]; then
                 if [ ! -f ".env" ]; then
                     echo "Creating .env from .env.example..."
@@ -147,17 +160,14 @@ jobs:
                     sed -i "s/DOCKER_NAMESPACE=your-username/DOCKER_NAMESPACE=khaccao/g" .env
                     sed -i "s/DOCKER_IMAGE_TAG=latest/DOCKER_IMAGE_TAG=staging/g" .env
                 fi
-            else
-                echo "ERROR: .env.example not found in $(pwd)"
-                ls -la
-                exit 1
             fi
             
-            # 3. Docker Sync 
+            # 4. Docker Sync & Restart
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker compose pull
             
-            # 4. Restart Services
+            # Navigate back to Backend dir as it contains the docker-compose.yml
+            cd $DEPLOY_DIR
+            docker compose pull
             docker compose down
             docker compose up -d --build
             
