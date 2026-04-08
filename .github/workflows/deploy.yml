@@ -143,12 +143,12 @@ jobs:
                 echo "Frontend directory not found, cloning..."
                 mkdir -p $FRONTEND_DIR
                 cd $FRONTEND_DIR
-                git clone -b staging https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/khaccao/AciPlatform_Frontend.git .
+                git clone -b testing https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/khaccao/AciPlatform_Frontend.git .
             else
                 cd $FRONTEND_DIR
                 echo "Updating Frontend..."
-                git fetch origin staging
-                git reset --hard origin/staging
+                git fetch origin testing
+                git reset --hard origin/testing
             fi
             
             # 3. Setup .env in Backend Dir
