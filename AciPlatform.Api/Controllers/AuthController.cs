@@ -28,6 +28,7 @@ public class AuthController : ControllerBase
     private readonly IInvoiceAuthorize _invoiceAuthorize;
     private readonly IUserCompanyService _userCompanyService;
     private readonly IRefreshTokenService _refreshTokenService;
+    private readonly ITwoFactorService _twoFactorService;
 
     public AuthController(
         IUserService userService, 
@@ -38,7 +39,8 @@ public class AuthController : ControllerBase
         ITokenService tokenService,
         IInvoiceAuthorize invoiceAuthorize,
         IUserCompanyService userCompanyService,
-        IRefreshTokenService refreshTokenService)
+        IRefreshTokenService refreshTokenService,
+        ITwoFactorService twoFactorService)
     {
         _userService = userService;
         _userRoleService = userRoleService;
@@ -49,6 +51,7 @@ public class AuthController : ControllerBase
         _invoiceAuthorize = invoiceAuthorize;
         _userCompanyService = userCompanyService;
         _refreshTokenService = refreshTokenService;
+        _twoFactorService = twoFactorService;
     }
 
     [HttpPost("login")]
@@ -103,6 +106,22 @@ public class AuthController : ControllerBase
                 }
             }
 
+            // Check 2FA
+            if (checkUser.TwoFactorEnabled)
+            {
+                return Ok(new ObjectReturn
+                {
+                    data = new
+                    {
+                        UserId = user.Id,
+                        Username = user.Username,
+                        Requires2FA = true
+                    },
+                    status = 202, // Accepted - Needs further action
+                    message = "2FA_REQUIRED",
+                });
+            }
+
             await _userService.UpdateLastLogin(user.Id);
 
             var roleIds = user.UserRoleIds?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
@@ -119,21 +138,14 @@ public class AuthController : ControllerBase
             }
 
             var tokenString = _tokenService.GenerateToken(user, roles, userCompanyCode);
-            // checkUser is UserAuthDto. user is User. 
-            // _tokenService.GenerateToken(user, roles) uses User entity. 
-            // Note: CodeMau Authenticate returned UserMapper.Auth (UserAuthDto). 
-            // But I retrieved `user` entity above using GetByUserName. 
-            // So passing `user` (Entity) to TokenService is fine.
-
             var menus = await _menuService.GetMenuPermissionsByUserId(user.Id);
-
             var refresh = await _refreshTokenService.CreateAsync(user.Id, TimeSpan.FromDays(30));
 
             // Set refresh token in HTTP-only cookie
             Response.Cookies.Append("refreshToken", refresh.Token, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true, // Set to true in production with HTTPS
+                Secure = true, 
                 SameSite = SameSiteMode.Strict,
                 Expires = refresh.ExpiresAt
             });
@@ -154,8 +166,6 @@ public class AuthController : ControllerBase
                     UserRoleIds = user.UserRoleIds,
                     YearCurrent = user.YearCurrent,
                     CompanyCode = userCompanyCode,
-                    IsDark = false, 
-                    Theme = "",
                 },
                 status = 200,
                 message = ResultErrorConstants.LOGIN_SUCCESS,
@@ -169,6 +179,58 @@ public class AuthController : ControllerBase
                 status = 400
             });
         }
+    }
+
+    [HttpPost("verify-2fa")]
+    [AllowAnonymous]
+    public async Task<IActionResult> VerifyTwoFactor([FromBody] TwoFactorRequest request)
+    {
+        var user = await _userService.GetById(request.UserId);
+        if (user == null || !user.TwoFactorEnabled || string.IsNullOrEmpty(user.TwoFactorSecret))
+            return BadRequest(new { message = "2FA entry invalid" });
+
+        if (!_twoFactorService.ValidateTwoFactorCode(user.TwoFactorSecret, request.Code))
+            return BadRequest(new { message = "Invalid OTP code" });
+
+        await _userService.UpdateLastLogin(user.Id);
+
+        var roleIds = user.UserRoleIds?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
+        var roles = (await _userRoleService.GetAll())
+            .Where(o => roleIds.Contains(o.Id.ToString()))
+            .Select(x => x.Code)
+            .ToList();
+
+        var companyCodes = await _userCompanyService.GetCompanyCodesByUsername(user.Username);
+        var userCompanyCode = companyCodes.FirstOrDefault() ?? "";
+
+        var tokenString = _tokenService.GenerateToken(user, roles, userCompanyCode);
+        var menus = await _menuService.GetMenuPermissionsByUserId(user.Id);
+        var refresh = await _refreshTokenService.CreateAsync(user.Id, TimeSpan.FromDays(30));
+
+        Response.Cookies.Append("refreshToken", refresh.Token, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = refresh.ExpiresAt
+        });
+
+        return Ok(new ObjectReturn
+        {
+            data = new
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Fullname = user.FullName,
+                Avatar = user.Avatar,
+                Token = tokenString,
+                RoleName = roles,
+                Menus = menus,
+                CompanyCode = userCompanyCode
+            },
+            status = 200,
+            message = ResultErrorConstants.LOGIN_SUCCESS
+        });
     }
 
     [HttpPost("requestForgotPass")]

@@ -1,0 +1,18 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  AciPlatform.Domain -> C:\Users\nguye\Expo\AciPlatform\AciPlatform.Domain\bin\Debug\net9.0\AciPlatform.Domain.dll
+  AciPlatform.Application -> C:\Users\nguye\Expo\AciPlatform\AciPlatform.Application\bin\Debug\net9.0\AciPlatform.Application.dll
+  AciPlatform.Infrastructure -> C:\Users\nguye\Expo\AciPlatform\AciPlatform.Infrastructure\bin\Debug\net9.0\AciPlatform.Infrastructure.dll
+C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\Controllers\SecurityController.cs(41,93): error CS1061: 'IdentityUser' does not contain a definition for 'Username' and no accessible extension method 'Username' accepting a first argument of type 'IdentityUser' could be found (are you missing a using directive or an assembly reference?) [C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\AciPlatform.Api.csproj]
+C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\Controllers\SecurityController.cs(50,61): error CS1061: 'IUserCompanyService' does not contain a definition for 'GetAll' and no accessible extension method 'GetAll' accepting a first argument of type 'IUserCompanyService' could be found (are you missing a using directive or an assembly reference?) [C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\AciPlatform.Api.csproj]
+C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\Controllers\SecurityController.cs(109,93): error CS1061: 'IdentityUser' does not contain a definition for 'Username' and no accessible extension method 'Username' accepting a first argument of type 'IdentityUser' could be found (are you missing a using directive or an assembly reference?) [C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\AciPlatform.Api.csproj]
+
+Build FAILED.
+
+C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\Controllers\SecurityController.cs(41,93): error CS1061: 'IdentityUser' does not contain a definition for 'Username' and no accessible extension method 'Username' accepting a first argument of type 'IdentityUser' could be found (are you missing a using directive or an assembly reference?) [C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\AciPlatform.Api.csproj]
+C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\Controllers\SecurityController.cs(50,61): error CS1061: 'IUserCompanyService' does not contain a definition for 'GetAll' and no accessible extension method 'GetAll' accepting a first argument of type 'IUserCompanyService' could be found (are you missing a using directive or an assembly reference?) [C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\AciPlatform.Api.csproj]
+C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\Controllers\SecurityController.cs(109,93): error CS1061: 'IdentityUser' does not contain a definition for 'Username' and no accessible extension method 'Username' accepting a first argument of type 'IdentityUser' could be found (are you missing a using directive or an assembly reference?) [C:\Users\nguye\Expo\AciPlatform\AciPlatform.Api\AciPlatform.Api.csproj]
+    0 Warning(s)
+    3 Error(s)
+
+Time Elapsed 00:00:01.79

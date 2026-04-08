@@ -10,10 +10,12 @@ namespace AciPlatform.Application.Services;
 public class UserService : IUserService
 {
     private readonly IApplicationDbContext _context;
+    private readonly ITwoFactorService _twoFactorService;
 
-    public UserService(IApplicationDbContext context)
+    public UserService(IApplicationDbContext context, ITwoFactorService twoFactorService)
     {
         _context = context;
+        _twoFactorService = twoFactorService;
     }
 
     public async Task<UserAuthDto?> Authenticate(string username, string password)
@@ -42,7 +44,8 @@ public class UserService : IUserService
             UserRoleIds = user.UserRoleIds ?? "",
             Timekeeper = user.Timekeeper ?? false,
             TargetId = user.TargetId ?? 0,
-            Language = user.Language ?? ""
+            Language = user.Language ?? "",
+            TwoFactorEnabled = user.TwoFactorEnabled
         };
     }
 
@@ -326,6 +329,67 @@ public class UserService : IUserService
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }
+    }
+
+    public async Task<TwoFactorSetupResponse> EnableTwoFactor(int userId)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null)
+            return new TwoFactorSetupResponse { Success = false, Message = "User not found" };
+
+        var secretKey = _twoFactorService.GenerateSecretKey();
+        var recoveryCodes = _twoFactorService.GenerateRecoveryCodes();
+
+        user.TwoFactorSecret = secretKey;
+        user.TwoFactorRecoveryCodes = string.Join(";", recoveryCodes);
+
+        var setupResponse = _twoFactorService.GenerateSetupCode(user.Email ?? user.Username, secretKey);
+        setupResponse.RecoveryCodes = recoveryCodes;
+
+        await _context.SaveChangesAsync();
+        return setupResponse;
+    }
+
+    public async Task<bool> ConfirmEnableTwoFactor(int userId, string code)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null || string.IsNullOrEmpty(user.TwoFactorSecret))
+            return false;
+
+        if (!_twoFactorService.ValidateTwoFactorCode(user.TwoFactorSecret, code))
+            return false;
+
+        user.TwoFactorEnabled = true;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> DisableTwoFactor(int userId)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null)
+            return false;
+
+        user.TwoFactorEnabled = false;
+        user.TwoFactorSecret = null;
+        user.TwoFactorRecoveryCodes = null;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<TwoFactorSetupResponse> GetTwoFactorSetup(int userId)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null)
+            return new TwoFactorSetupResponse { Success = false, Message = "User not found" };
+
+        if (string.IsNullOrEmpty(user.TwoFactorSecret))
+            return await EnableTwoFactor(userId);
+
+        var setupResponse = _twoFactorService.GenerateSetupCode(user.Email ?? user.Username, user.TwoFactorSecret);
+        setupResponse.RecoveryCodes = user.TwoFactorRecoveryCodes?.Split(';').ToList();
+        
+        return setupResponse;
     }
 
     private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

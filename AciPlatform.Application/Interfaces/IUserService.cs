@@ -23,4 +23,10 @@ public interface IUserService
     Task<IEnumerable<User>> GetAllUserActive(List<string> roles, int userId);
     Task<IEnumerable<User>> GetAllUserNotRole();
     Task UpdateCurrentYear(int year, int userId);
+
+    // 2FA Methods
+    Task<TwoFactorSetupResponse> EnableTwoFactor(int userId);
+    Task<bool> ConfirmEnableTwoFactor(int userId, string code);
+    Task<bool> DisableTwoFactor(int userId);
+    Task<TwoFactorSetupResponse> GetTwoFactorSetup(int userId);
 }

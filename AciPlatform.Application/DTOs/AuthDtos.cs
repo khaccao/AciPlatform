@@ -52,6 +52,7 @@ public class UserAuthDto
     public bool Timekeeper { get; set; }
     public int TargetId { get; set; }
     public string Language { get; set; } = string.Empty;
+    public bool TwoFactorEnabled { get; set; }
 }
 
 public class SelectTypePayModel

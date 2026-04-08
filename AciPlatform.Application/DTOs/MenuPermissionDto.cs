@@ -13,4 +13,6 @@ public class MenuPermissionDto
     public bool Edit { get; set; }
     public bool Delete { get; set; }
     public bool Approve { get; set; }
+    public bool IsParent { get; set; }
+    public string? CodeParent { get; set; }
 }

@@ -26,7 +26,10 @@ public class MenuService : IMenuService
         if (user == null || string.IsNullOrEmpty(user.UserRoleIds))
             return new List<Menu>();
 
-        var roleIds = user.UserRoleIds.Split(',').Select(int.Parse).ToList();
+        var roleIds = user.UserRoleIds.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(id => int.TryParse(id.Trim(), out var parsed) ? parsed : 0)
+            .Where(id => id > 0)
+            .ToList();
 
         // Join MenuRoles and Menus
         // Logic: Get menus where UserRole is in user's roles AND View permission is true
@@ -76,7 +79,9 @@ public class MenuService : IMenuService
                 Add = true,
                 Edit = true,
                 Delete = true,
-                Approve = true
+                Approve = true,
+                IsParent = menu.IsParent ?? false,
+                CodeParent = menu.CodeParent
             }).ToList();
         }
 
@@ -101,7 +106,9 @@ public class MenuService : IMenuService
                 Add = um.Add,
                 Edit = um.Edit,
                 Delete = um.Delete,
-                Approve = um.Approve
+                Approve = um.Approve,
+                IsParent = um.Menu?.IsParent ?? false,
+                CodeParent = um.Menu?.CodeParent
             }).OrderBy(m => m.Order).ToList();
         }
 
@@ -132,7 +139,9 @@ public class MenuService : IMenuService
                     Add = g.Any(x => x.Add == true),
                     Edit = g.Any(x => x.Edit == true),
                     Delete = g.Any(x => x.Delete == true),
-                    Approve = g.Any(x => x.Approve == true)
+                    Approve = g.Any(x => x.Approve == true),
+                    IsParent = false, // Will be updated below
+                    CodeParent = null // Will be updated below
                 });
 
         foreach (var menu in menus)
@@ -144,6 +153,8 @@ public class MenuService : IMenuService
                 permission.NameEN = menu.NameEN;
                 permission.NameKO = menu.NameKO;
                 permission.Order = menu.Order;
+                permission.IsParent = menu.IsParent ?? false;
+                permission.CodeParent = menu.CodeParent;
             }
         }
 
@@ -173,7 +184,9 @@ public class MenuService : IMenuService
                      Add = false,
                      Edit = false,
                      Delete = false,
-                     Approve = false
+                     Approve = false,
+                     IsParent = parent.IsParent ?? false,
+                     CodeParent = parent.CodeParent
                  };
                  // Also add to the list for final processing if needed, 
                  // though we are iterating 'menus' below which needs to include these new ones if we want them sorted correctly.
@@ -248,7 +261,7 @@ public class MenuService : IMenuService
     public async Task Create(Menu menu)
     {
         if (await _context.Menus.AnyAsync(x => x.Code == menu.Code))
-            throw new Exception($"Menu code {menu.Code} already exists");
+            throw new ArgumentException($"Menu code {menu.Code} already exists");
 
         _context.Menus.Add(menu);
         await _context.SaveChangesAsync();
@@ -320,14 +333,14 @@ public class MenuService : IMenuService
             Name = menu.Name,
             NameEN = menu.NameEN,
             NameKO = menu.NameKO,
-            CodeParent = menu.CodeParent,
+            CodeParent = string.IsNullOrEmpty(menu.CodeParent) ? null : menu.CodeParent,
             IsParent = menu.IsParent,
             Order = menu.Order,
             Note = menu.Note
         };
 
         if (await _context.Menus.AnyAsync(x => x.Code == entity.Code))
-            throw new Exception($"Menu code {entity.Code} already exists");
+            throw new ArgumentException($"Mã Menu '{entity.Code}' đã tồn tại trong hệ thống.");
 
         _context.Menus.Add(entity);
         await _context.SaveChangesAsync();
@@ -339,16 +352,49 @@ public class MenuService : IMenuService
         if (menu == null)
             throw new Exception("Menu not found");
 
-        menu.Code = menuViewModel.Code;
+        var oldCode = menu.Code;
+        var newCode = menuViewModel.Code?.Trim() ?? string.Empty;
+        var newCodeParent = string.IsNullOrWhiteSpace(menuViewModel.CodeParent) ? null : menuViewModel.CodeParent.Trim();
+
+        // 1. Prevent self-parenting
+        if (newCode == newCodeParent && !string.IsNullOrEmpty(newCode))
+        {
+            throw new ArgumentException("Menu không thể làm danh mục cha của chính nó.");
+        }
+
+        // 2. Validate code uniqueness if code changed
+        if (oldCode != newCode)
+        {
+            if (await _context.Menus.AnyAsync(x => x.Id != menuViewModel.Id && x.Code == newCode))
+                throw new ArgumentException($"Mã Menu '{newCode}' đã được sử dụng bởi một Menu khác.");
+        }
+
+        // 3. Update the menu
+        if (oldCode != newCode)
+        {
+            menu.Code = newCode;
+        }
+        
         menu.Name = menuViewModel.Name;
         menu.NameEN = menuViewModel.NameEN;
         menu.NameKO = menuViewModel.NameKO;
-        menu.CodeParent = menuViewModel.CodeParent;
+        menu.CodeParent = newCodeParent;
         menu.IsParent = menuViewModel.IsParent;
         menu.Order = menuViewModel.Order;
         menu.Note = menuViewModel.Note;
 
         _context.Menus.Update(menu);
+
+        // 4. If Code changed, update children's CodeParent reference
+        if (oldCode != newCode)
+        {
+            var children = await _context.Menus.Where(m => m.CodeParent == oldCode).ToListAsync();
+            foreach (var child in children)
+            {
+                child.CodeParent = newCode;
+            }
+        }
+
         await _context.SaveChangesAsync();
     }
 }

@@ -74,4 +74,9 @@ public class User
     public int? UserUpdated { get; set; }
     
     public bool IsDeleted { get; set; } = false;
+
+    // 2FA Fields
+    public bool TwoFactorEnabled { get; set; } = false;
+    public string? TwoFactorSecret { get; set; }
+    public string? TwoFactorRecoveryCodes { get; set; } // Semicolon separated list
 }

@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using Newtonsoft.Json;
+using AciPlatform.Api.Filters;
 
 namespace AciPlatform.Api.Controllers;
 
 [Authorize(Roles = "SuperAdmin,ADMINCOMPANY")]
+[ServiceFilter(typeof(FleetExceptionFilter))]
 [Route("api/[controller]")]
 [ApiController]
 public class MenusController : ControllerBase
@@ -100,6 +102,7 @@ public class MenusController : ControllerBase
         return Ok(model);
     }
 
+    [Authorize(Roles = "SuperAdmin")]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] MenuViewModel model)
     {
@@ -107,6 +110,7 @@ public class MenusController : ControllerBase
         return Ok();
     }
 
+    [Authorize(Roles = "SuperAdmin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] MenuViewModel model)
     {
@@ -120,6 +124,7 @@ public class MenusController : ControllerBase
         return Ok();
     }
 
+    [Authorize(Roles = "SuperAdmin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
