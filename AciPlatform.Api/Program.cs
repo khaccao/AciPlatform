@@ -86,6 +86,7 @@ builder.Services.AddScoped<IFacebookService, FacebookService>();
 builder.Services.AddScoped<IAIService, BasicAIService>();
 builder.Services.AddScoped<IAutomationService, AutomationService>();
 builder.Services.AddScoped<ITwoFactorService, TwoFactorService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<FleetExceptionFilter>();
 
 // Configure DbContext with Dynamic Connection String

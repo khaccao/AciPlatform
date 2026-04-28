@@ -8,6 +8,7 @@ using AciPlatform.Domain.Entities.Auth;
 using AciPlatform.Domain.Entities.MultiChannel;
 using AciPlatform.Domain.Entities.QLKho;
 using AciPlatform.Domain.Entities.FleetTransportation;
+using AciPlatform.Domain.Entities.Sell;
 using Microsoft.EntityFrameworkCore;
 
 namespace AciPlatform.Infrastructure.Persistence;
@@ -43,6 +44,12 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<UserMenu> UserMenus { get; set; }
 
+    // R&D Project Management
+    public DbSet<Project> Projects { get; set; }
+    public DbSet<ProjectMember> ProjectMembers { get; set; }
+    public DbSet<ProjectTask> ProjectTasks { get; set; }
+    public DbSet<ProjectDocument> ProjectDocuments { get; set; }
+
     public DbSet<FacebookAppConfig> FacebookAppConfigs { get; set; }
     public DbSet<FacebookPage> FacebookPages { get; set; }
     public DbSet<SocialPost> SocialPosts { get; set; }
@@ -73,6 +80,23 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<PetrolConsumptionPoliceCheckPoint> PetrolConsumptionPoliceCheckPoints { get; set; }
     public DbSet<PoliceCheckPoint> PoliceCheckPoints { get; set; }
     public DbSet<RoadRoute> RoadRoutes { get; set; }
+
+    // Sell Module
+    public DbSet<GoodCustomer> GoodCustomers { get; set; }
+    public DbSet<GoodDetail> GoodDetails { get; set; }
+    public DbSet<Goods> Goods { get; set; }
+    public DbSet<GoodsPriceList> GoodsPriceLists { get; set; }
+    public DbSet<GoodsPromotion> GoodsPromotions { get; set; }
+    public DbSet<GoodsPromotionDetail> GoodsPromotionDetails { get; set; }
+    public DbSet<GoodsQuota> GoodsQuotas { get; set; }
+    public DbSet<GoodsQuotaDetail> GoodsQuotaDetails { get; set; }
+    public DbSet<GoodsQuotaRecipe> GoodsQuotaRecipes { get; set; }
+    public DbSet<GoodsQuotaStep> GoodsQuotaSteps { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderDetail> OrderDetails { get; set; }
+    public DbSet<OrderSuccessful> OrderSuccessfuls { get; set; }
+    public DbSet<Payer> Payers { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -140,12 +164,50 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.CompanyCode).HasMaxLength(50);
         });
 
-        // Configure RefreshToken entity
         modelBuilder.Entity<RefreshToken>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Token).HasMaxLength(200);
             entity.HasIndex(e => e.Token).IsUnique();
+        });
+
+        // Configure R&D Project Management
+        modelBuilder.Entity<Project>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.Code).IsUnique();
+        });
+
+        modelBuilder.Entity<ProjectMember>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne(d => d.Project)
+                  .WithMany()
+                  .HasForeignKey(d => d.ProjectId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ProjectTask>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne(d => d.Project)
+                  .WithMany()
+                  .HasForeignKey(d => d.ProjectId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ProjectDocument>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne(d => d.Project)
+                  .WithMany()
+                  .HasForeignKey(d => d.ProjectId)
+                  .OnDelete(DeleteBehavior.Cascade);
+                  
+            entity.HasOne(d => d.Task)
+                  .WithMany()
+                  .HasForeignKey(d => d.TaskId)
+                  .OnDelete(DeleteBehavior.NoAction);
         });
     }
 }

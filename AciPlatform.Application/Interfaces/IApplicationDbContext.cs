@@ -7,6 +7,7 @@ using AciPlatform.Domain.Entities.Auth;
 using AciPlatform.Domain.Entities.MultiChannel;
 using AciPlatform.Domain.Entities.QLKho;
 using AciPlatform.Domain.Entities.FleetTransportation;
+using AciPlatform.Domain.Entities.Sell;
 using Microsoft.EntityFrameworkCore;
 
 namespace AciPlatform.Application.Interfaces;
@@ -37,6 +38,12 @@ public interface IApplicationDbContext
     DbSet<UserCompany> UserCompanies { get; }
     DbSet<RefreshToken> RefreshTokens { get; }
     DbSet<UserMenu> UserMenus { get; }
+
+    // R&D Project Management
+    DbSet<Project> Projects { get; }
+    DbSet<ProjectMember> ProjectMembers { get; }
+    DbSet<ProjectTask> ProjectTasks { get; }
+    DbSet<ProjectDocument> ProjectDocuments { get; }
     
     // MultiChannel
     DbSet<FacebookAppConfig> FacebookAppConfigs { get; }
@@ -71,6 +78,22 @@ public interface IApplicationDbContext
     DbSet<PetrolConsumptionPoliceCheckPoint> PetrolConsumptionPoliceCheckPoints { get; }
     DbSet<PoliceCheckPoint> PoliceCheckPoints { get; }
     DbSet<RoadRoute> RoadRoutes { get; }
+    
+    // Sell Module
+    DbSet<GoodCustomer> GoodCustomers { get; }
+    DbSet<GoodDetail> GoodDetails { get; }
+    DbSet<Goods> Goods { get; }
+    DbSet<GoodsPriceList> GoodsPriceLists { get; }
+    DbSet<GoodsPromotion> GoodsPromotions { get; }
+    DbSet<GoodsPromotionDetail> GoodsPromotionDetails { get; }
+    DbSet<GoodsQuota> GoodsQuotas { get; }
+    DbSet<GoodsQuotaDetail> GoodsQuotaDetails { get; }
+    DbSet<GoodsQuotaRecipe> GoodsQuotaRecipes { get; }
+    DbSet<GoodsQuotaStep> GoodsQuotaSteps { get; }
+    DbSet<Order> Orders { get; }
+    DbSet<OrderDetail> OrderDetails { get; }
+    DbSet<OrderSuccessful> OrderSuccessfuls { get; }
+    DbSet<Payer> Payers { get; }
     
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
