@@ -1,7 +1,7 @@
-using ManageEmployee.DataTransferObject.PagingRequest;
-using ManageEmployee.Entities;
+﻿using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Domain.Entities.Ledger;
 
-namespace ManageEmployee.Services.Interfaces.Inventorys;
+namespace AciPlatform.Application.Services.Ledger.Interfaces.Inventorys;
 
 public interface IInventoryService
 {

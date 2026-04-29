@@ -1,8 +1,8 @@
-using ManageEmployee.DataTransferObject.LedgerWarehouseModels;
-using ManageEmployee.DataTransferObject.PagingRequest;
-using ManageEmployee.DataTransferObject.PagingResultModels;
+﻿using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger;
 
-namespace ManageEmployee.Services.Interfaces.Ledgers;
+namespace AciPlatform.Application.Services.Ledger.Interfaces.Ledgers;
 
 public interface ILedgerWareHouseService
 {

@@ -1,24 +1,25 @@
+﻿using AciPlatform.Application.Interfaces;
 using AutoMapper;
-using Common.Errors;
-using ManageEmployee.Dal.DbContexts;
-using ManageEmployee.DataTransferObject.LedgerWarehouseModels;
-using ManageEmployee.DataTransferObject.PagingRequest;
-using ManageEmployee.DataTransferObject.PagingResultModels;
-using ManageEmployee.DataTransferObject.V3;
-using ManageEmployee.Entities.Enumerations;
-using ManageEmployee.Helpers;
-using ManageEmployee.Services.Interfaces.Ledgers;
-using ManageEmployee.Services.Interfaces.Ledgers.V3;
+using AciPlatform.Application.Common;
+using AciPlatform.Infrastructure.Data;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Domain.Entities.Ledger;
+using AciPlatform.Application.Helpers;
+using AciPlatform.Application.Services.Ledger.Interfaces.Ledgers;
+using AciPlatform.Application.Services.Ledger.Interfaces.Ledgers.V3;
 using Microsoft.EntityFrameworkCore;
 
-namespace ManageEmployee.Services.LedgerServices;
+namespace AciPlatform.Application.Services.Ledger.LedgerServices;
 
 public class LedgerWareHouseService : ILedgerWareHouseService
 {
-    private readonly ApplicationDbContext _dbcontext;
+    private readonly IApplicationDbContext _dbcontext;
     private readonly ILedgerV3Service _ledgerV3Service;
     private readonly IMapper _mapper;
-    public LedgerWareHouseService(ApplicationDbContext dbcontext, ILedgerV3Service ledgerV3Service, IMapper mapper)
+    public LedgerWareHouseService(IApplicationDbContext dbcontext, ILedgerV3Service ledgerV3Service, IMapper mapper)
     {
         _dbcontext = dbcontext;
         _ledgerV3Service = ledgerV3Service;
@@ -127,10 +128,10 @@ public class LedgerWareHouseService : ILedgerWareHouseService
             else
                 maHang = ledger.DebitCodeName;
 
-            ledger.OrginalDescription = "Nhập bán " + maHang;
+            ledger.OrginalDescription = "Nháº­p bĂ¡n " + maHang;
             if (good.GoodsType == nameof(GoodsTypeEnum.COMBO))
             {
-                ledger.OrginalDescription = "Nhập bán Combo " + maHang + " khuyến mãi";
+                ledger.OrginalDescription = "Nháº­p bĂ¡n Combo " + maHang + " khuyáº¿n mĂ£i";
             }
             ledger.OrginalDescriptionEN = "";
             ledger.AttachVoucher = "";
@@ -176,7 +177,7 @@ public class LedgerWareHouseService : ILedgerWareHouseService
             else
             {
                 ledger.OrginalAddress = "";
-                ledger.OrginalCompanyName = "Khách hàng online";
+                ledger.OrginalCompanyName = "KhĂ¡ch hĂ ng online";
             }
 
             ledger.DebitCodeName = listChartOfAcc.Find(x => x.Code == ledger.DebitCode)?.Name;
@@ -198,3 +199,5 @@ public class LedgerWareHouseService : ILedgerWareHouseService
                 ledger.InvoiceTaxCode = khachHang_tax?.TaxCode;
                 ledger.InvoiceName = khachHang_tax?.CompanyName;
                 ledger.InvoiceAddress = khachHang_tax?.Address;
+
+

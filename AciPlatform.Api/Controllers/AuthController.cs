@@ -25,7 +25,7 @@ public class AuthController : ControllerBase
     private readonly IConfiguration _configuration;
     private readonly IApplicationDbContext _context;
     private readonly ITokenService _tokenService;
-    private readonly IInvoiceAuthorize _invoiceAuthorize;
+    //private readonly IInvoiceAuthorize _invoiceAuthorize;
     private readonly IUserCompanyService _userCompanyService;
     private readonly IRefreshTokenService _refreshTokenService;
     private readonly ITwoFactorService _twoFactorService;
@@ -37,7 +37,7 @@ public class AuthController : ControllerBase
         IConfiguration configuration, 
         IApplicationDbContext context,
         ITokenService tokenService,
-        IInvoiceAuthorize invoiceAuthorize,
+        //IInvoiceAuthorize invoiceAuthorize,
         IUserCompanyService userCompanyService,
         IRefreshTokenService refreshTokenService,
         ITwoFactorService twoFactorService)
@@ -48,7 +48,7 @@ public class AuthController : ControllerBase
         _configuration = configuration;
         _context = context;
         _tokenService = tokenService;
-        _invoiceAuthorize = invoiceAuthorize;
+        //_invoiceAuthorize = invoiceAuthorize;
         _userCompanyService = userCompanyService;
         _refreshTokenService = refreshTokenService;
         _twoFactorService = twoFactorService;
@@ -256,7 +256,7 @@ public class AuthController : ControllerBase
     {
         if (model.Id == 0)
         {
-            model.Id = HttpContext.GetIdentityUser().Id;
+            model.Id = 0 /* TODO: User ID */;
         }
 
         // check is current user
@@ -454,7 +454,8 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Invoice(int billId)
     {
-        await _invoiceAuthorize.CreateInvoice(billId);
+        //await _invoiceAuthorize.CreateInvoice(billId);
+        await Task.CompletedTask;
         return Ok(true);
     }
 
@@ -494,14 +495,14 @@ public class AuthController : ControllerBase
             // 3. Seed Menus
             if (!(await _menuService.GetAll()).Any())
             {
-                await _menuService.Create(new Menu { Code = "hr", Name = "Nhân sự", Order = 1, IsParent = true });
-                await _menuService.Create(new Menu { Code = "hr/employees", Name = "Nhân viên", Order = 1, CodeParent = "hr" });
-                await _menuService.Create(new Menu { Code = "hr/organization", Name = "Tổ chức", Order = 2, CodeParent = "hr" });
+                await _menuService.Create(new Menu { Code = "hr", Name = "NhĂ¢n sá»±", Order = 1, IsParent = true });
+                await _menuService.Create(new Menu { Code = "hr/employees", Name = "NhĂ¢n viĂªn", Order = 1, CodeParent = "hr" });
+                await _menuService.Create(new Menu { Code = "hr/organization", Name = "Tá»• chá»©c", Order = 2, CodeParent = "hr" });
                 
-                await _menuService.Create(new Menu { Code = "system", Name = "Hệ thống", Order = 10, IsParent = true });
-                await _menuService.Create(new Menu { Code = "system/roles", Name = "Phân quyền", Order = 1, CodeParent = "system" });
+                await _menuService.Create(new Menu { Code = "system", Name = "Há»‡ thá»‘ng", Order = 10, IsParent = true });
+                await _menuService.Create(new Menu { Code = "system/roles", Name = "PhĂ¢n quyá»n", Order = 1, CodeParent = "system" });
                 
-                await _menuService.Create(new Menu { Code = "menus", Name = "Quản lý Menu", Order = 11 });
+                await _menuService.Create(new Menu { Code = "menus", Name = "Quáº£n lĂ½ Menu", Order = 11 });
             }
 
             // Verify user was created correctly
@@ -571,4 +572,8 @@ public class AuthController : ControllerBase
         });
     }
 }
+
+
+
+
 

@@ -1,8 +1,8 @@
-using ManageEmployee.DataTransferObject.BaseResponseModels;
-using ManageEmployee.DataTransferObject.PagingRequest;
-using ManageEmployee.Entities.WareHouseEntities;
-using ManageEmployee.Helpers;
-using ManageEmployee.Services.Interfaces.WareHouses;
+﻿using AciPlatform.Application.DTOs.Ledger.BaseResponseModels;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Domain.Entities.Ledger.WareHouseEntities;
+using AciPlatform.Application.Helpers;
+using AciPlatform.Application.Services.Ledger.Interfaces.WareHouses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -86,3 +86,4 @@ public class WareHousePositionsController : ControllerBase
         return Ok();
     }
 }
+

@@ -1,4 +1,4 @@
-using AciPlatform.Application.DTOs;
+﻿using AciPlatform.Application.DTOs;
 using AciPlatform.Application.Interfaces;
 using AciPlatform.Application.Interfaces.HoSoNhanSu;
 using AciPlatform.Application.Helpers;
@@ -88,7 +88,7 @@ public class SecurityController : ControllerBase
         if (result)
             return Ok(true);
         
-        return BadRequest(new { message = "Mã OTP không chính xác hoặc đã hết hạn" });
+        return BadRequest(new { message = "MĂ£ OTP khĂ´ng chĂ­nh xĂ¡c hoáº·c Ä‘Ă£ háº¿t háº¡n" });
     }
 
     [HttpPost("disable-2fa/{userId}")]
@@ -133,3 +133,4 @@ public class SecurityController : ControllerBase
         return false;
     }
 }
+

@@ -1,4 +1,4 @@
-using AciPlatform.Application.Interfaces.HoSoNhanSu;
+﻿using AciPlatform.Application.Interfaces.HoSoNhanSu;
 using AciPlatform.Domain.Entities.HoSoNhanSu;
 using Microsoft.EntityFrameworkCore;
 using AciPlatform.Application.Interfaces;
@@ -42,3 +42,4 @@ public class UserCompanyService : IUserCompanyService
         await _context.SaveChangesAsync();
     }
 }
+

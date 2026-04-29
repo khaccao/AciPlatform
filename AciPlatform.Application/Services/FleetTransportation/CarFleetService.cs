@@ -1,4 +1,4 @@
-using AciPlatform.Application.DTOs;
+﻿using AciPlatform.Application.DTOs;
 using AciPlatform.Application.Interfaces.FleetTransportation;
 using AciPlatform.Domain.Entities.FleetTransportation;
 using Microsoft.EntityFrameworkCore;
@@ -90,3 +90,4 @@ public class CarFleetService : ICarFleetService
         return new CarFleetModel { Id = item.Id, Name = item.Name, Description = item.Description };
     }
 }
+

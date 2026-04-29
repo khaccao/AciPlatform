@@ -1,6 +1,6 @@
-using ManageEmployee.Entities.BaseEntities;
+﻿using AciPlatform.Domain.Entities.BaseEntities;
 
-namespace ManageEmployee.Entities;
+namespace AciPlatform.Domain.Entities.Ledger;
 
 public class Warehouse : BaseEntity
 {

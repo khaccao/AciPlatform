@@ -1,4 +1,4 @@
-using AciPlatform.Application.Interfaces;
+﻿using AciPlatform.Application.Interfaces;
 using AciPlatform.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -52,3 +52,5 @@ public class MenuRoleService : IMenuRoleService
         await _context.SaveChangesAsync();
     }
 }
+
+

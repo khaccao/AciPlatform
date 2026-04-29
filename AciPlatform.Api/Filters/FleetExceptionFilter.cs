@@ -49,7 +49,8 @@ public sealed class FleetExceptionFilter : IAsyncExceptionFilter
                 context.Result = new ObjectResult(new
                 {
                     code = StatusCodes.Status500InternalServerError,
-                    message = "An unexpected server error occurred."
+                    message = context.Exception.Message + (context.Exception.InnerException != null ? " - " + context.Exception.InnerException.Message : ""),
+                    stack = context.Exception.StackTrace
                 })
                 {
                     StatusCode = StatusCodes.Status500InternalServerError

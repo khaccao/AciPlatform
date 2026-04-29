@@ -1,10 +1,10 @@
-using ManageEmployee.Filters;
+﻿using ManageEmployee.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ManageEmployee.Services.Interfaces.Ledgers;
-using ManageEmployee.DataTransferObject;
-using ManageEmployee.DataTransferObject.PagingRequest;
-using ManageEmployee.DataTransferObject.LedgerWarehouseModels;
+using AciPlatform.Application.Services.Ledger.Interfaces.Ledgers;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger;
 
 namespace ManageEmployee.Controllers;
 
@@ -48,3 +48,4 @@ public class LedgerWarehousesController : ControllerBase
         });
     }
 }
+

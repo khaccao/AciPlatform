@@ -1,8 +1,8 @@
-using ManageEmployee.DataTransferObject.PagingRequest;
-using ManageEmployee.DataTransferObject.PagingResultModels;
-using ManageEmployee.DataTransferObject.WarehouseModel;
+﻿using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger.WarehouseModel;
 
-namespace ManageEmployee.Services.Interfaces.WareHouses;
+namespace AciPlatform.Application.Services.Ledger.Interfaces.WareHouses;
 
 public interface IWareHouseShelvesService
 {

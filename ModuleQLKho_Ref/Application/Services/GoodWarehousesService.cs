@@ -1,31 +1,32 @@
+﻿using AciPlatform.Application.Interfaces;
 using AutoMapper;
 using Common.Constants;
 using ManageEmployee.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
-using ManageEmployee.Dal.DbContexts;
-using ManageEmployee.Services.Interfaces.ChartOfAccounts;
-using ManageEmployee.Services.Interfaces.Goods;
-using ManageEmployee.DataTransferObject.WarehouseModel;
-using ManageEmployee.Entities;
-using ManageEmployee.Entities.LedgerEntities;
-using ManageEmployee.Entities.GoodsEntities;
-using ManageEmployee.Entities.ChartOfAccountEntities;
-using ManageEmployee.DataTransferObject.BillModels;
-using ManageEmployee.DataTransferObject.GoodsModels;
-using ManageEmployee.DataTransferObject.SearchModels;
-using ManageEmployee.DataTransferObject.PagingResultModels;
-using ManageEmployee.Entities.BillEntities;
+using AciPlatform.Infrastructure.Data;
+using AciPlatform.Application.Services.Ledger.Interfaces.ChartOfAccounts;
+using AciPlatform.Application.Services.Ledger.Interfaces.Goods;
+using AciPlatform.Application.DTOs.Ledger.WarehouseModel;
+using AciPlatform.Domain.Entities.Ledger;
+using AciPlatform.Domain.Entities.Ledger.LedgerEntities;
+using AciPlatform.Domain.Entities.Ledger.GoodsEntities;
+using AciPlatform.Domain.Entities.Ledger.ChartOfAccountEntities;
+using AciPlatform.Application.DTOs.Ledger.BillModels;
+using AciPlatform.Application.DTOs.Ledger.GoodsModels;
+using AciPlatform.Application.DTOs.Ledger.SearchModels;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Domain.Entities.Ledger.BillEntities;
 
-namespace ManageEmployee.Services;
+namespace AciPlatform.Application.Services.Ledger;
 public class GoodWarehousesService : IGoodWarehousesService
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly IHubContext<BroadcastHub, IHubClient> _hubContext;
     private readonly IChartOfAccountService _chartOfAccountService;
-    public GoodWarehousesService(ApplicationDbContext context, IMapper mapper, IHubContext<BroadcastHub, IHubClient> hubContext, IChartOfAccountService chartOfAccountService)
+    public GoodWarehousesService(IApplicationDbContext context, IMapper mapper, IHubContext<BroadcastHub, IHubClient> hubContext, IChartOfAccountService chartOfAccountService)
     {
         _context = context;
         _mapper = mapper;
@@ -120,7 +121,7 @@ public class GoodWarehousesService : IGoodWarehousesService
                         var shevel = shevels.Find(X => X.Id == goodWarehouseDetail.WareHouseShelvesId);
                         var floor = floors.Find(X => X.Id == goodWarehouseDetail.WareHouseFloorId);
                         var position = positions.Find(X => X.Id == goodWarehouseDetail.WareHousePositionId);
-                        data.Positions.Add("Số lượng " + goodWarehouseDetail.Quantity.ToString() + " " + warehouse?.Name + ", " + shevel?.Name + ", " + floor?.Name + ", " + position?.Name);
+                        data.Positions.Add("Sá»‘ lÆ°á»£ng " + goodWarehouseDetail.Quantity.ToString() + " " + warehouse?.Name + ", " + shevel?.Name + ", " + floor?.Name + ", " + position?.Name);
                     }
 
                 }
@@ -198,3 +199,5 @@ public class GoodWarehousesService : IGoodWarehousesService
                 if (goodWarehouse.Id == 0)
                     goodWarehouses.Add(goodWarehouse);
                 else
+
+

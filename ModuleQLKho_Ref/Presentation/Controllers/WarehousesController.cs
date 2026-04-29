@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using ManageEmployee.Helpers;
-using ManageEmployee.Services.Interfaces.WareHouses;
-using ManageEmployee.DataTransferObject.PagingRequest;
-using ManageEmployee.DataTransferObject.WarehouseModel;
-using ManageEmployee.DataTransferObject.BaseResponseModels;
+using AciPlatform.Application.Helpers;
+using AciPlatform.Application.Services.Ledger.Interfaces.WareHouses;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger.WarehouseModel;
+using AciPlatform.Application.DTOs.Ledger.BaseResponseModels;
 
 namespace ManageEmployee.Controllers;
 
@@ -100,3 +100,4 @@ public class WarehousesController : ControllerBase
         }
     }
 }
+

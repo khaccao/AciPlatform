@@ -1,4 +1,4 @@
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
@@ -52,3 +52,4 @@ public class TokenService : ITokenService
         return tokenHandler.WriteToken(token);
     }
 }
+

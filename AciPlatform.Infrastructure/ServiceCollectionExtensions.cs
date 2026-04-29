@@ -15,7 +15,7 @@ public static class ServiceCollectionExtensions
         string connectionString)
     {
         // Add DbContext
-        services.AddDbContext<ApplicationDbContext>(options =>
+        services.AddDbContext<AciPlatform.Infrastructure.Persistence.ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString,
                 b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
@@ -28,3 +28,5 @@ public static class ServiceCollectionExtensions
         return services;
     }
 }
+
+

@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using AciPlatform.Application.Interfaces;
 using AciPlatform.Domain.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
@@ -53,3 +53,4 @@ public class RefreshTokenService : IRefreshTokenService
         return Convert.ToBase64String(bytes);
     }
 }
+

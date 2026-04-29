@@ -15,6 +15,12 @@ public class Customer
     [MaxLength(255)]
     public string? Name { get; set; }
 
+    [MaxLength(50)]
+    public string? TaxCode { get; set; } // Mã số thuế (dùng cho Kế toán xuất hóa đơn)
+
+    public bool IsSupplier { get; set; } = false; // Phân biệt Nhà cung cấp (331) hay Khách hàng (131)
+
+
     [MaxLength(255)]
     public string? Avatar { get; set; }
 

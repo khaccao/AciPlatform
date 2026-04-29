@@ -1,11 +1,11 @@
-using ManageEmployee.DataTransferObject.BillModels;
-using ManageEmployee.DataTransferObject.GoodsModels;
-using ManageEmployee.DataTransferObject.PagingResultModels;
-using ManageEmployee.DataTransferObject.SearchModels;
-using ManageEmployee.DataTransferObject.WarehouseModel;
-using ManageEmployee.Entities.LedgerEntities;
+﻿using AciPlatform.Application.DTOs.Ledger.BillModels;
+using AciPlatform.Application.DTOs.Ledger.GoodsModels;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger.SearchModels;
+using AciPlatform.Application.DTOs.Ledger.WarehouseModel;
+using AciPlatform.Domain.Entities.Ledger.LedgerEntities;
 
-namespace ManageEmployee.Services.Interfaces.Goods;
+namespace AciPlatform.Application.Services.Ledger.Interfaces.Goods;
 
 public interface IGoodWarehousesService
 {

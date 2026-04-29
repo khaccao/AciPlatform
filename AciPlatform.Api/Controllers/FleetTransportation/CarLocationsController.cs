@@ -1,4 +1,4 @@
-using AciPlatform.Application.DTOs;
+﻿using AciPlatform.Application.DTOs;
 using AciPlatform.Application.Helpers;
 using AciPlatform.Application.Interfaces.FleetTransportation;
 using AciPlatform.Api.Filters;
@@ -23,7 +23,7 @@ public class CarLocationsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] FilterParams param)
     {
-        return Ok(await _carLocationService.GetPaging(param, HttpContext.GetIdentityUser().Id));
+        return Ok(await _carLocationService.GetPaging(param, 0 /* TODO: User ID */));
     }
 
     [HttpGet("{id}")]
@@ -35,7 +35,7 @@ public class CarLocationsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CarLocationModel model)
     {
-        await _carLocationService.Create(model, HttpContext.GetIdentityUser().Id);
+        await _carLocationService.Create(model, 0 /* TODO: User ID */);
         return Ok(new { code = 200 });
     }
 
@@ -43,21 +43,21 @@ public class CarLocationsController : ControllerBase
     public async Task<IActionResult> Update(int id, [FromBody] CarLocationModel model)
     {
         model.Id = id;
-        await _carLocationService.Update(model, HttpContext.GetIdentityUser().Id);
+        await _carLocationService.Update(model, 0 /* TODO: User ID */);
         return Ok(new { code = 200 });
     }
 
     [HttpPut("accept/{id}")]
     public async Task<IActionResult> Accept(int id)
     {
-        await _carLocationService.Accept(id, HttpContext.GetIdentityUser().Id);
+        await _carLocationService.Accept(id, 0 /* TODO: User ID */);
         return Ok(new { code = 200 });
     }
 
     [HttpPut("not-accept/{id}")]
     public async Task<IActionResult> NotAccept(int id)
     {
-        await _carLocationService.NotAccept(id, HttpContext.GetIdentityUser().Id);
+        await _carLocationService.NotAccept(id, 0 /* TODO: User ID */);
         return Ok(new { code = 200 });
     }
 
@@ -80,3 +80,4 @@ public class CarLocationsController : ControllerBase
         return Ok(new { data = await _carLocationService.Export(id) });
     }
 }
+

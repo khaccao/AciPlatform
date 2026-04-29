@@ -1,4 +1,4 @@
-using AciPlatform.Application.DTOs;
+﻿using AciPlatform.Application.DTOs;
 using AciPlatform.Application.Interfaces;
 using AciPlatform.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -309,3 +309,4 @@ public class ProjectService : IProjectService
         };
     }
 }
+

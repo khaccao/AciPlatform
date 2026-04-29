@@ -1,3 +1,4 @@
+﻿using AciPlatform.Application.Interfaces;
 using AciPlatform.Domain.Entities;
 using AciPlatform.Domain.Interfaces;
 using AciPlatform.Infrastructure.Persistence;
@@ -7,9 +8,9 @@ namespace AciPlatform.Infrastructure.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IApplicationDbContext _context;
 
-    public UserRepository(ApplicationDbContext context)
+    public UserRepository(IApplicationDbContext context)
     {
         _context = context;
     }
@@ -51,3 +52,4 @@ public class UserRepository : IUserRepository
         }
     }
 }
+

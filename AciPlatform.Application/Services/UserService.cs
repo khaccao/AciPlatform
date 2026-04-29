@@ -1,4 +1,4 @@
-using AciPlatform.Application.DTOs;
+﻿using AciPlatform.Application.DTOs;
 using AciPlatform.Application.Helpers;
 using System.Security.Cryptography;
 using AciPlatform.Application.Interfaces;
@@ -229,8 +229,8 @@ public class UserService : IUserService
 
         IQueryable<User> query = baseQuery;
 
-        // BẮT ĐẦU FIX LOGIC ADMINCOMPANY: DÙNG INNER JOIN ĐỂ CHỈ VIEW USER THUỘC COMPANY
-        // Nếu khác SuperAdmin và có mã công ty, chỉ truy xuất các nhân viên trong mã công ty đó.
+        // Báº®T Äáº¦U FIX LOGIC ADMINCOMPANY: DĂ™NG INNER JOIN Äá»‚ CHá»ˆ VIEW USER THUá»˜C COMPANY
+        // Náº¿u khĂ¡c SuperAdmin vĂ  cĂ³ mĂ£ cĂ´ng ty, chá»‰ truy xuáº¥t cĂ¡c nhĂ¢n viĂªn trong mĂ£ cĂ´ng ty Ä‘Ă³.
         if (filterParams.roles != null && !filterParams.roles.Contains("SuperAdmin") && !string.IsNullOrEmpty(filterParams.CompanyCode))
         {
             query = from u in baseQuery
@@ -422,3 +422,4 @@ public class UserService : IUserService
         return true;
     }
 }
+

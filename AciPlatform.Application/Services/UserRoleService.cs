@@ -1,4 +1,4 @@
-using AciPlatform.Application.Interfaces;
+﻿using AciPlatform.Application.Interfaces;
 using AciPlatform.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -79,3 +79,4 @@ public class UserRoleService : IUserRoleService
         return await query.OrderBy(x => x.Order).ToListAsync();
     }
 }
+

@@ -49,6 +49,7 @@ public class BillService : IBillService
     {
         // TODO: Logic hủy hóa đơn
         // await _messagePublisher.PublishAsync(new BillCancelledEvent { BillId = id });
-        throw new NotImplementedException();
+        await Task.CompletedTask; throw new NotImplementedException();
     }
 }
+

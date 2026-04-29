@@ -1,4 +1,4 @@
-using AciPlatform.Application.DTOs;
+﻿using AciPlatform.Application.DTOs;
 using AciPlatform.Application.Interfaces;
 using AciPlatform.Application.Interfaces.ChamCong;
 using AciPlatform.Domain.Entities.ChamCong;
@@ -104,7 +104,7 @@ public class TimeKeepingService : ITimeKeepingService
                 CheckIn = DateTime.UtcNow,
                 AttendanceMethod = "Face",
                 CapturedImage = request.CapturedImage,
-                Note = request.Note ?? "Check-in Khuôn mặt",
+                Note = request.Note ?? "Check-in KhuĂ´n máº·t",
                 CreatedDate = DateTime.UtcNow
             };
             _context.TimeKeepingEntries.Add(entity);
@@ -117,7 +117,7 @@ public class TimeKeepingService : ITimeKeepingService
                 entity.WorkingHours = (entity.CheckOut.Value - entity.CheckIn.Value).TotalHours;
             }
             entity.AttendanceMethod = "Face";
-            entity.Note = (entity.Note ?? "") + " | Check-out Khuôn mặt";
+            entity.Note = (entity.Note ?? "") + " | Check-out KhuĂ´n máº·t";
             entity.UpdatedDate = DateTime.UtcNow;
             _context.TimeKeepingEntries.Update(entity);
         }
@@ -126,3 +126,4 @@ public class TimeKeepingService : ITimeKeepingService
         return entity;
     }
 }
+

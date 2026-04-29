@@ -1,4 +1,4 @@
-using AciPlatform.Application.DTOs.Events;
+﻿using AciPlatform.Application.DTOs.Events;
 using AciPlatform.Application.Interfaces;
 using AciPlatform.Application.Interfaces.Messaging;
 using AciPlatform.Application.Interfaces.Sell;
@@ -25,7 +25,7 @@ public class OrderService : IOrderService
         _context.Orders.Add(order);
         await _context.SaveChangesAsync(cancellationToken);
 
-        // Phát ra Event để các module khác (VD: Notification) lắng nghe
+        // PhĂ¡t ra Event Ä‘á»ƒ cĂ¡c module khĂ¡c (VD: Notification) láº¯ng nghe
         var orderEvent = new OrderCreatedEvent
         {
             OrderId = order.Id,
@@ -52,7 +52,8 @@ public class OrderService : IOrderService
             order.Status = 0; // 0 = Canceled
             await _context.SaveChangesAsync(cancellationToken);
             
-            // TODO: Bắn Event order.cancelled
+            // TODO: Báº¯n Event order.cancelled
         }
     }
 }
+

@@ -1,15 +1,16 @@
-using ManageEmployee.Dal.DbContexts;
-using ManageEmployee.DataTransferObject.PagingRequest;
-using ManageEmployee.DataTransferObject.Reports;
-using ManageEmployee.Entities;
-using ManageEmployee.Entities.GoodsEntities;
-using ManageEmployee.Services.Interfaces.Inventorys;
+﻿using AciPlatform.Application.Interfaces;
+using AciPlatform.Infrastructure.Data;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Domain.Entities.Ledger;
+using AciPlatform.Domain.Entities.Ledger.GoodsEntities;
+using AciPlatform.Application.Services.Ledger.Interfaces.Inventorys;
 
-namespace ManageEmployee.Services;
+namespace AciPlatform.Application.Services.Ledger;
 public class InventoryService: IInventoryService
 {
-    private readonly ApplicationDbContext _context;
-    public InventoryService(ApplicationDbContext context)
+    private readonly IApplicationDbContext _context;
+    public InventoryService(IApplicationDbContext context)
     {
         _context = context;
     }
@@ -123,3 +124,4 @@ public class InventoryService: IInventoryService
         return "";
     }
 }
+

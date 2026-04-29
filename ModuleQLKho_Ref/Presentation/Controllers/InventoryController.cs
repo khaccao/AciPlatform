@@ -1,7 +1,7 @@
-using ManageEmployee.DataTransferObject.BaseResponseModels;
-using ManageEmployee.DataTransferObject.PagingRequest;
-using ManageEmployee.Entities;
-using ManageEmployee.Services.Interfaces.Inventorys;
+﻿using AciPlatform.Application.DTOs.Ledger.BaseResponseModels;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Domain.Entities.Ledger;
+using AciPlatform.Application.Services.Ledger.Interfaces.Inventorys;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -49,3 +49,4 @@ public class InventoryController : ControllerBase
         return Ok(data);
     }
 }
+

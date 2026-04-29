@@ -1,4 +1,4 @@
-using AciPlatform.Application.DTOs;
+﻿using AciPlatform.Application.DTOs;
 using AciPlatform.Application.Interfaces;
 using AciPlatform.Application.Helpers;
 using AciPlatform.Domain.Entities;
@@ -230,3 +230,4 @@ public class WebAuthService : IWebAuthService
         return true;
     }
 }
+

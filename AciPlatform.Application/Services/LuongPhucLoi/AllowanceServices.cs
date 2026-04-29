@@ -1,4 +1,4 @@
-using AciPlatform.Application.DTOs;
+﻿using AciPlatform.Application.DTOs;
 using AciPlatform.Application.Interfaces;
 using AciPlatform.Application.Interfaces.LuongPhucLoi;
 using AciPlatform.Domain.Entities.LuongPhucLoi;
@@ -185,3 +185,4 @@ public class SalaryTypeService : ISalaryTypeService
         await _context.SaveChangesAsync();
     }
 }
+

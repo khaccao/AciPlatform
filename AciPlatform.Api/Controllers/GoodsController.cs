@@ -1,4 +1,4 @@
-using AciPlatform.Application.DTOs;
+﻿using AciPlatform.Application.DTOs;
 using AciPlatform.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -132,3 +132,4 @@ public class GoodsController : ControllerBase
         return Ok(new ObjectReturn { data = true, status = 200, message = "Sync endpoint accepted" });
     }
 }
+

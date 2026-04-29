@@ -36,6 +36,7 @@ public class UserMenuService : IUserMenuService
             NameEN = um.Menu?.NameEN,
             NameKO = um.Menu?.NameKO,
             Order = um.Menu?.Order,
+            Icon = um.Menu?.Icon,
             View = um.View,
             Add = um.Add,
             Edit = um.Edit,
@@ -108,3 +109,4 @@ public class UserMenuService : IUserMenuService
         await _context.SaveChangesAsync();
     }
 }
+

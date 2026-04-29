@@ -31,4 +31,7 @@ public class Menu
 
     [MaxLength(255)]
     public string? Note { get; set; }
+
+    [MaxLength(100)]
+    public string? Icon { get; set; }
 }

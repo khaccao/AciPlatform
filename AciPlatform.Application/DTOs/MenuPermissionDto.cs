@@ -15,4 +15,5 @@ public class MenuPermissionDto
     public bool Approve { get; set; }
     public bool IsParent { get; set; }
     public string? CodeParent { get; set; }
+    public string? Icon { get; set; }
 }

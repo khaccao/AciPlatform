@@ -1,16 +1,17 @@
-using ManageEmployee.Dal.DbContexts;
-using ManageEmployee.DataTransferObject.GoodsModels;
-using ManageEmployee.DataTransferObject.PagingRequest;
-using ManageEmployee.DataTransferObject.PagingResultModels;
-using ManageEmployee.Services.Interfaces.Goods;
+﻿using AciPlatform.Application.Interfaces;
+using AciPlatform.Infrastructure.Data;
+using AciPlatform.Application.DTOs.Ledger.GoodsModels;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.Services.Ledger.Interfaces.Goods;
 using Microsoft.EntityFrameworkCore;
 
-namespace ManageEmployee.Services;
+namespace AciPlatform.Application.Services.Ledger;
 public class GoodWarehouseExportService : IGoodWarehouseExportService
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IApplicationDbContext _context;
 
-    public GoodWarehouseExportService(ApplicationDbContext context)
+    public GoodWarehouseExportService(IApplicationDbContext context)
     {
         _context = context;
     }
@@ -84,3 +85,4 @@ public class GoodWarehouseExportService : IGoodWarehouseExportService
         return string.Empty;
     }
 }
+

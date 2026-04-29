@@ -1,9 +1,9 @@
-using ManageEmployee.DataTransferObject.PagingRequest;
-using ManageEmployee.DataTransferObject.PagingResultModels;
-using ManageEmployee.DataTransferObject.WarehouseModel;
-using ManageEmployee.Entities.WareHouseEntities;
+﻿using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger.WarehouseModel;
+using AciPlatform.Domain.Entities.Ledger.WareHouseEntities;
 
-namespace ManageEmployee.Services.Interfaces.WareHouses;
+namespace AciPlatform.Application.Services.Ledger.Interfaces.WareHouses;
 
 public interface IWareHousePositionService
 {

@@ -1,4 +1,4 @@
-using AciPlatform.Application.Interfaces;
+﻿using AciPlatform.Application.Interfaces;
 using AciPlatform.Application.Interfaces.MultiChannel;
 using AciPlatform.Domain.Entities.MultiChannel;
 using Microsoft.EntityFrameworkCore;
@@ -54,3 +54,4 @@ public class AutomationService : IAutomationService
         await _context.SaveChangesAsync();
     }
 }
+

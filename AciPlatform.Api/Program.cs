@@ -53,7 +53,7 @@ builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 builder.Services.AddScoped<IMenuRoleService, MenuRoleService>();
 builder.Services.AddScoped<IUserMenuService, UserMenuService>();
 builder.Services.AddScoped<IWebAuthService, WebAuthService>();
-builder.Services.AddScoped<IInvoiceAuthorize, InvoiceAuthorize>();
+// builder.Services.AddScoped<IInvoiceAuthorize, InvoiceAuthorize>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IPositionDetailService, PositionDetailService>();
@@ -90,7 +90,7 @@ builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<FleetExceptionFilter>();
 
 // Configure DbContext with Dynamic Connection String
-builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
+builder.Services.AddDbContext<AciPlatform.Infrastructure.Persistence.ApplicationDbContext>((sp, options) =>
 {
     var connectionStringProvider = sp.GetRequiredService<IConnectionStringProvider>();
     var connectionString = connectionStringProvider.GetConnectionString();
@@ -98,7 +98,7 @@ builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
 });
 
 // Register IApplicationDbContext (Scoped)
-builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<AciPlatform.Infrastructure.Persistence.ApplicationDbContext>());
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -147,7 +147,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-        var context = services.GetRequiredService<ApplicationDbContext>();
+        var context = services.GetRequiredService<AciPlatform.Infrastructure.Persistence.ApplicationDbContext>();
         context.Database.Migrate();
         Console.WriteLine("Database migrated successfully.");
     }
@@ -158,3 +158,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+
+
+

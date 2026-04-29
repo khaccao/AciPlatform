@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace ManageEmployee.Entities.WareHouseEntities;
+namespace AciPlatform.Domain.Entities.Ledger.WareHouseEntities;
 
 public class WareHouseShelves
 {

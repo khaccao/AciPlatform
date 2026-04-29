@@ -166,6 +166,7 @@ public class FacebookService : IFacebookService
                 new { date = DateTime.Today, value = 150 }
             }
         };
-        return System.Text.Json.JsonSerializer.Serialize(data);
+        await Task.CompletedTask; return System.Text.Json.JsonSerializer.Serialize(data);
     }
 }
+

@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using ManageEmployee.Services.Interfaces.Goods;
-using ManageEmployee.DataTransferObject;
-using ManageEmployee.DataTransferObject.BillModels;
-using ManageEmployee.DataTransferObject.GoodsModels;
-using ManageEmployee.DataTransferObject.SearchModels;
+using AciPlatform.Application.Services.Ledger.Interfaces.Goods;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger.BillModels;
+using AciPlatform.Application.DTOs.Ledger.GoodsModels;
+using AciPlatform.Application.DTOs.Ledger.SearchModels;
 
 namespace ManageEmployee.Controllers;
 
@@ -94,3 +94,4 @@ public class GoodWarehousesController : ControllerBase
         });
     }
 }
+

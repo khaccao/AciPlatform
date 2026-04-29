@@ -139,6 +139,9 @@ namespace AciPlatform.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsSupplier")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -163,6 +166,10 @@ namespace AciPlatform.Infrastructure.Migrations
 
                     b.Property<int?>("ProvinceId")
                         .HasColumnType("int");
+
+                    b.Property<string>("TaxCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
@@ -1205,6 +1212,423 @@ namespace AciPlatform.Infrastructure.Migrations
                     b.ToTable("UserContractHistories");
                 });
 
+            modelBuilder.Entity("AciPlatform.Domain.Entities.Ledger.ChartOfAccount", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("AccGroup")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("ArisingCredit")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("ArisingCreditNB")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("ArisingDebit")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("ArisingDebitNB")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("ArisingForeignCredit")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("ArisingForeignCreditNB")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("ArisingForeignDebit")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("ArisingForeignDebitNB")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("ArisingStockQuantity")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("ArisingStockQuantityNB")
+                        .HasColumnType("float");
+
+                    b.Property<int>("Classification")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Currency")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("DisplayDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("DisplayInsert")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Duration")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("ExchangeRate")
+                        .HasColumnType("float");
+
+                    b.Property<bool>("HasChild")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HasDetails")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsForeignCurrency")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("IsInternal")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("OpeningCredit")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("OpeningCreditNB")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("OpeningDebit")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("OpeningDebitNB")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("OpeningForeignCredit")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("OpeningForeignCreditNB")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("OpeningForeignDebit")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("OpeningForeignDebitNB")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("OpeningStockQuantity")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("OpeningStockQuantityNB")
+                        .HasColumnType("float");
+
+                    b.Property<string>("ParentRef")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Protected")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StockUnit")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("StockUnitPrice")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("StockUnitPriceNB")
+                        .HasColumnType("float");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<string>("WarehouseCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WarehouseName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChartOfAccounts");
+                });
+
+            modelBuilder.Entity("AciPlatform.Domain.Entities.Ledger.LedgerEntry", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("AmountImportWarehouse")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("AmountTransport")
+                        .HasColumnType("float");
+
+                    b.Property<string>("AttachVoucher")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("BillId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("BookDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("Classification")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreditCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreditCodeName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreditDetailCodeFirst")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreditDetailCodeFirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreditDetailCodeSecond")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreditDetailCodeSecondName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreditWarehouse")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreditWarehouseName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DebitCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DebitCodeName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DebitDetailCodeFirst")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DebitDetailCodeFirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DebitDetailCodeSecond")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DebitDetailCodeSecondName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DebitWarehouse")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DebitWarehouseName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeleteAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DepreciaDuration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DepreciaMonth")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Detail1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Detail2")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("ExchangeRate")
+                        .HasColumnType("float");
+
+                    b.Property<int>("Group")
+                        .HasColumnType("int");
+
+                    b.Property<string>("InvoiceAdditionalDeclarationCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InvoiceAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InvoiceCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("InvoiceDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InvoiceName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InvoiceNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InvoiceProductItem")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InvoiceSerial")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InvoiceTaxCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsAriseMark")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("IsInternal")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsVoucher")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OrginalAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("OrginalBookDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("OrginalCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrginalCompanyName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("OrginalCurrency")
+                        .HasColumnType("float");
+
+                    b.Property<string>("OrginalDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrginalDescriptionEN")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrginalFullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrginalVoucherNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("PercentImportTax")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("PercentTransport")
+                        .HasColumnType("float");
+
+                    b.Property<string>("ProjectCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Quantity")
+                        .HasColumnType("float");
+
+                    b.Property<string>("ReferenceAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ReferenceBookDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReferenceFullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReferenceVoucherNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Tab")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("UnitPrice")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime?>("UpdateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserCreated")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UserDeleted")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UserUpdated")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("VoucherNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LedgerEntries");
+                });
+
             modelBuilder.Entity("AciPlatform.Domain.Entities.LuongPhucLoi.Allowance", b =>
                 {
                     b.Property<int>("Id")
@@ -1342,6 +1766,10 @@ namespace AciPlatform.Infrastructure.Migrations
                     b.Property<string>("CodeParent")
                         .HasMaxLength(36)
                         .HasColumnType("nvarchar(36)");
+
+                    b.Property<string>("Icon")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool?>("IsParent")
                         .HasColumnType("bit");

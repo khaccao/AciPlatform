@@ -1,4 +1,4 @@
-using AciPlatform.Application.DTOs;
+﻿using AciPlatform.Application.DTOs;
 using AciPlatform.Application.Interfaces;
 using AciPlatform.Application.Interfaces.FleetTransportation;
 using AciPlatform.Domain.Entities.FleetTransportation;
@@ -227,3 +227,4 @@ public class PetrolConsumptionService : IPetrolConsumptionService
             .ToListAsync();
     }
 }
+

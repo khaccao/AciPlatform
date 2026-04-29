@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace ManageEmployee.Entities;
+namespace AciPlatform.Domain.Entities.Ledger;
 
 public class Inventory
 {

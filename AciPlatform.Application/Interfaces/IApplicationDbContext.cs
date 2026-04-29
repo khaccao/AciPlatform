@@ -1,3 +1,4 @@
+﻿using AciPlatform.Application.Interfaces;
 using AciPlatform.Domain.Entities;
 using AciPlatform.Domain.Entities.HoSoNhanSu;
 using AciPlatform.Domain.Entities.LuongPhucLoi;
@@ -19,6 +20,9 @@ public interface IApplicationDbContext
     DbSet<Menu> Menus { get; }
     DbSet<MenuRole> MenuRoles { get; }
     DbSet<Customer> Customers { get; }
+    DbSet<AciPlatform.Domain.Entities.Ledger.ChartOfAccount> ChartOfAccounts { get; }
+    DbSet<AciPlatform.Domain.Entities.Ledger.LedgerEntry> LedgerEntries { get; }
+    DbSet<TEntity> Set<TEntity>() where TEntity : class;
     DbSet<Department> Departments { get; }
     DbSet<PositionDetail> PositionDetails { get; }
     DbSet<Degree> Degrees { get; }
@@ -97,4 +101,8 @@ public interface IApplicationDbContext
     
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
+
+
+
+
 

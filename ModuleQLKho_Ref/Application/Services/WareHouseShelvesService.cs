@@ -1,22 +1,23 @@
+﻿using AciPlatform.Application.Interfaces;
 using AutoMapper;
 using Common.Extensions;
-using ManageEmployee.Dal.DbContexts;
-using ManageEmployee.DataTransferObject.PagingRequest;
-using ManageEmployee.DataTransferObject.PagingResultModels;
-using ManageEmployee.DataTransferObject.WarehouseModel;
-using ManageEmployee.Entities.Constants;
-using ManageEmployee.Entities.WareHouseEntities;
-using ManageEmployee.Helpers;
-using ManageEmployee.Services.Interfaces.WareHouses;
+using AciPlatform.Infrastructure.Data;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger.WarehouseModel;
+using AciPlatform.Domain.Entities.Ledger;
+using AciPlatform.Domain.Entities.Ledger.WareHouseEntities;
+using AciPlatform.Application.Helpers;
+using AciPlatform.Application.Services.Ledger.Interfaces.WareHouses;
 using Microsoft.EntityFrameworkCore;
 
-namespace ManageEmployee.Services.WareHouseService;
+namespace AciPlatform.Application.Services.Ledger.WareHouseService;
 public class WareHouseShelvesService: IWareHouseShelvesService
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
 
-    public WareHouseShelvesService(ApplicationDbContext context, IMapper mapper)
+    public WareHouseShelvesService(IApplicationDbContext context, IMapper mapper)
     {
         _context = context;
         _mapper = mapper;
@@ -155,3 +156,4 @@ public class WareHouseShelvesService: IWareHouseShelvesService
         }
     }
 }
+

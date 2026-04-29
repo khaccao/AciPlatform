@@ -1,8 +1,8 @@
-using ManageEmployee.DataTransferObject.BaseResponseModels;
-using ManageEmployee.DataTransferObject.PagingRequest;
-using ManageEmployee.DataTransferObject.WarehouseModel;
-using ManageEmployee.Helpers;
-using ManageEmployee.Services.Interfaces.WareHouses;
+﻿using AciPlatform.Application.DTOs.Ledger.BaseResponseModels;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger.WarehouseModel;
+using AciPlatform.Application.Helpers;
+using AciPlatform.Application.Services.Ledger.Interfaces.WareHouses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -82,3 +82,4 @@ public class WareHouseShelvesController : ControllerBase
         return Ok();
     }
 }
+

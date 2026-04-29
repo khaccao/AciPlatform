@@ -1,6 +1,6 @@
-using ManageEmployee.DataTransferObject;
-using ManageEmployee.DataTransferObject.PagingRequest;
-using ManageEmployee.Services.Interfaces.Goods;
+﻿using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.DTOs.Ledger;
+using AciPlatform.Application.Services.Ledger.Interfaces.Goods;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,3 +40,4 @@ public class GoodWarehouseExportsController : ControllerBase
         });
     }
 }
+

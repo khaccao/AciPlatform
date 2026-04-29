@@ -42,6 +42,11 @@ public class CustomersController : ControllerBase
             query = query.Where(x => x.Phone == param.Phone);
         }
 
+        if (param.IsSupplier.HasValue)
+        {
+            query = query.Where(x => x.IsSupplier == param.IsSupplier.Value);
+        }
+
         if (!string.IsNullOrWhiteSpace(param.Email))
         {
             query = query.Where(x => x.Email == param.Email);
@@ -60,6 +65,8 @@ public class CustomersController : ControllerBase
                 Phone = x.Phone,
                 Email = x.Email,
                 Address = x.Address,
+                TaxCode = x.TaxCode,
+                IsSupplier = x.IsSupplier,
                 CreatedDate = x.CreatedDate
             })
             .ToListAsync();
@@ -173,6 +180,8 @@ public class CustomersController : ControllerBase
         existed.Phone = customer.Phone;
         existed.Email = customer.Email;
         existed.Address = customer.Address;
+        existed.TaxCode = customer.TaxCode;
+        existed.IsSupplier = customer.IsSupplier;
         existed.ProvinceId = customer.ProvinceId;
         existed.DistrictId = customer.DistrictId;
         existed.WardId = customer.WardId;
@@ -248,3 +257,4 @@ public class CustomersController : ControllerBase
         return $"{prefix}{nextNumber:D4}";
     }
 }
+

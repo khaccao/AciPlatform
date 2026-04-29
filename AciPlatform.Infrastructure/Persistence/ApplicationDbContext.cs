@@ -1,4 +1,4 @@
-using AciPlatform.Application.Interfaces;
+﻿using AciPlatform.Application.Interfaces;
 using AciPlatform.Domain.Entities;
 using AciPlatform.Domain.Entities.HoSoNhanSu;
 using AciPlatform.Domain.Entities.LuongPhucLoi;
@@ -24,6 +24,8 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Menu> Menus { get; set; }
     public DbSet<MenuRole> MenuRoles { get; set; }
     public DbSet<Customer> Customers { get; set; }
+    public DbSet<AciPlatform.Domain.Entities.Ledger.ChartOfAccount> ChartOfAccounts { get; set; }
+    public DbSet<AciPlatform.Domain.Entities.Ledger.LedgerEntry> LedgerEntries { get; set; }
     public DbSet<Department> Departments { get; set; }
     public DbSet<PositionDetail> PositionDetails { get; set; }
     public DbSet<Degree> Degrees { get; set; }
@@ -211,3 +213,4 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
         });
     }
 }
+
