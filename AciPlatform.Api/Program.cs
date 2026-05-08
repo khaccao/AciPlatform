@@ -142,7 +142,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Auto-migrate database on startup
-using (var scope = app.Services.CreateScope())
+await using (var scope = app.Services.CreateAsyncScope())
 {
     var services = scope.ServiceProvider;
     try
@@ -150,10 +150,13 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<AciPlatform.Infrastructure.Persistence.ApplicationDbContext>();
         context.Database.Migrate();
         Console.WriteLine("Database migrated successfully.");
+
+        // Seed initial data (idempotent – chạy an toàn nhiều lần)
+        await AciPlatform.Infrastructure.Persistence.Seeders.DatabaseSeeder.SeedAllAsync(context);
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"An error occurred migrating the DB: {ex}");
+        Console.WriteLine($"An error occurred migrating/seeding the DB: {ex.Message}");
     }
 }
 
