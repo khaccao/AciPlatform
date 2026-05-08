@@ -1,4 +1,4 @@
-﻿using AciPlatform.Application.DTOs;
+using AciPlatform.Application.DTOs;
 using AciPlatform.Application.Helpers;
 using System.Security.Cryptography;
 using AciPlatform.Application.Interfaces;
@@ -61,7 +61,7 @@ public class UserService : IUserService
 
     public async Task<User?> GetByUserName(string username)
     {
-        return await _context.Users.SingleOrDefaultAsync(x => x.Username == username);
+        return await _context.Users.SingleOrDefaultAsync(x => x.Username == username && !x.IsDeleted);
     }
 
     public async Task<User> Create(User user, string password)

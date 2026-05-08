@@ -47,13 +47,12 @@ public static class DatabaseSeeder
     // 2. USERS
     private static async Task SeedUsersAsync(ApplicationDbContext context)
     {
-        if (await context.Users.AnyAsync()) { Console.WriteLine("⏭  Users skipped."); return; }
-
         var allRoles = await context.UserRoles.ToDictionaryAsync(r => r.Code, r => r.Id);
         string RoleIds(params string[] codes) =>
             string.Join(",", codes.Where(allRoles.ContainsKey).Select(c => allRoles[c].ToString()));
 
-        var users = new[]
+        // Danh sách users cần có trong hệ thống
+        var userDefs = new[]
         {
             // username, fullname, email, phone, password, roleIds
             ("admin",         "Super Administrator",   "admin@aciplatform.vn", "0900000001", "Admin@123",   RoleIds("SuperAdmin")),
@@ -69,37 +68,64 @@ public static class DatabaseSeeder
             ("vu.van.giang",  "Vũ Văn Giang",          "vu.van.giang@bha.vn",  "0900000008", "Password123", RoleIds("Employee")),
         };
 
-        foreach (var (username, fullname, email, phone, password, roleIds) in users)
+        // Seed từng user nếu chưa tồn tại (idempotent)
+        int seededCount = 0;
+        foreach (var (username, fullname, email, phone, password, roleIds) in userDefs)
         {
-            var (hash, salt) = CreatePasswordHash(password);
-            context.Users.Add(new User
+            if (!await context.Users.AnyAsync(u => u.Username == username))
             {
-                Username = username, FullName = fullname, Email = email, Phone = phone,
-                UserRoleIds = roleIds, PasswordHash = hash, PasswordSalt = salt,
-                Status = 1, IsDeleted = false, TwoFactorEnabled = false,
-                CreatedDate = DateTime.Now, YearCurrent = DateTime.Now.Year,
-            });
+                var (hash, salt) = CreatePasswordHash(password);
+                context.Users.Add(new User
+                {
+                    Username = username, FullName = fullname, Email = email, Phone = phone,
+                    UserRoleIds = roleIds, PasswordHash = hash, PasswordSalt = salt,
+                    Status = 1, IsDeleted = false, TwoFactorEnabled = false,
+                    CreatedDate = DateTime.Now, YearCurrent = DateTime.Now.Year,
+                });
+                seededCount++;
+            }
         }
-        await context.SaveChangesAsync();
-        Console.WriteLine($"✅ Seeded {users.Length} Users");
-
-        // UserCompany
-        if (!await context.UserCompanies.AnyAsync())
+        if (seededCount > 0)
         {
-            var map = await context.Users.ToDictionaryAsync(u => u.Username, u => u.Id);
-            int Uid(string n) => map.GetValueOrDefault(n, 0);
-            var asgn = new (int, string)[]
-            {
-                (Uid("admin"),         "ACI"), (Uid("admin"),         "BHA"),
-                (Uid("nguyen.van.an"), "ACI"), (Uid("tran.thi.binh"), "ACI"),
-                (Uid("le.van.cuong"),  "ACI"), (Uid("do.thi.phuong"), "ACI"),
-                (Uid("bha.admin"),     "BHA"), (Uid("pham.thi.dung"), "BHA"),
-                (Uid("hoang.van.em"),  "BHA"), (Uid("vu.van.giang"),  "BHA"),
-            };
-            foreach (var (uid, code) in asgn.Where(a => a.Item1 > 0))
-                context.UserCompanies.Add(new UserCompany { UserId = uid, CompanyCode = code });
             await context.SaveChangesAsync();
-            Console.WriteLine($"✅ Seeded {asgn.Length} UserCompanies");
+            Console.WriteLine($"✅ Seeded {seededCount} Users");
+        }
+        else
+        {
+            Console.WriteLine("⏭  Users skipped (already exist).");
+        }
+
+        // UserCompany – seed LUÔN LUÔN (idempotent, chạy sau khi users đã có)
+        var userMap = await context.Users.Where(u => !u.IsDeleted).ToDictionaryAsync(u => u.Username, u => u.Id);
+        int Uid(string n) => userMap.GetValueOrDefault(n, 0);
+
+        var assignments = new (int UserId, string CompanyCode)[]
+        {
+            (Uid("admin"),         "ACI"), (Uid("admin"),         "BHA"),
+            (Uid("nguyen.van.an"), "ACI"), (Uid("tran.thi.binh"), "ACI"),
+            (Uid("le.van.cuong"),  "ACI"), (Uid("do.thi.phuong"), "ACI"),
+            (Uid("bha.admin"),     "BHA"), (Uid("pham.thi.dung"), "BHA"),
+            (Uid("hoang.van.em"),  "BHA"), (Uid("vu.van.giang"),  "BHA"),
+        };
+
+        int ucSeeded = 0;
+        foreach (var (uid, code) in assignments.Where(a => a.UserId > 0))
+        {
+            bool exists = await context.UserCompanies.AnyAsync(x => x.UserId == uid && x.CompanyCode == code);
+            if (!exists)
+            {
+                context.UserCompanies.Add(new UserCompany { UserId = uid, CompanyCode = code });
+                ucSeeded++;
+            }
+        }
+        if (ucSeeded > 0)
+        {
+            await context.SaveChangesAsync();
+            Console.WriteLine($"✅ Seeded {ucSeeded} UserCompanies");
+        }
+        else
+        {
+            Console.WriteLine("⏭  UserCompanies skipped (already exist).");
         }
     }
 
