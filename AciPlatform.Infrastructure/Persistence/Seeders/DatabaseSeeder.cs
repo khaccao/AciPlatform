@@ -2,6 +2,7 @@ using AciPlatform.Domain.Entities;
 using AciPlatform.Domain.Entities.HoSoNhanSu;
 using AciPlatform.Domain.Entities.Sell;
 using AciPlatform.Domain.Entities.QLKho;
+using AciPlatform.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 
@@ -15,7 +16,7 @@ public static class DatabaseSeeder
         return (hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password)), hmac.Key);
     }
 
-    public static async Task SeedAllAsync(ApplicationDbContext context)
+    public static async Task SeedAllAsync(IApplicationDbContext context)
     {
         await SeedUserRolesAsync(context);
         await SeedUsersAsync(context);
@@ -25,7 +26,7 @@ public static class DatabaseSeeder
     }
 
     // 1. USER ROLES
-    private static async Task SeedUserRolesAsync(ApplicationDbContext context)
+    private static async Task SeedUserRolesAsync(IApplicationDbContext context)
     {
         if (await context.UserRoles.AnyAsync()) { Console.WriteLine("⏭  UserRoles skipped."); return; }
         context.UserRoles.AddRange(
@@ -45,7 +46,7 @@ public static class DatabaseSeeder
     }
 
     // 2. USERS
-    private static async Task SeedUsersAsync(ApplicationDbContext context)
+    private static async Task SeedUsersAsync(IApplicationDbContext context)
     {
         var allRoles = await context.UserRoles.ToDictionaryAsync(r => r.Code, r => r.Id);
         string RoleIds(params string[] codes) =>
@@ -130,7 +131,7 @@ public static class DatabaseSeeder
     }
 
     // 3. MENUS
-    private static async Task SeedMenusAsync(ApplicationDbContext context)
+    private static async Task SeedMenusAsync(IApplicationDbContext context)
     {
         if (await context.Menus.AnyAsync()) { Console.WriteLine("⏭  Menus skipped."); return; }
 
@@ -206,7 +207,7 @@ public static class DatabaseSeeder
     }
 
     // 4. MENU ROLES – PERMISSION MATRIX
-    private static async Task SeedMenuRolesAsync(ApplicationDbContext context)
+    private static async Task SeedMenuRolesAsync(IApplicationDbContext context)
     {
         if (await context.MenuRoles.AnyAsync()) { Console.WriteLine("⏭  MenuRoles skipped."); return; }
 
@@ -285,7 +286,7 @@ public static class DatabaseSeeder
     }
 
     // 5. SAMPLE DATA
-    private static async Task SeedSampleDataAsync(ApplicationDbContext context)
+    private static async Task SeedSampleDataAsync(IApplicationDbContext context)
     {
         // Departments
         if (!await context.Departments.AnyAsync())
