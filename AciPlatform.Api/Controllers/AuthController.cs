@@ -599,7 +599,6 @@ public class AuthController : ControllerBase
             UserCount = users.Count
         });
     }
-    }
 }
 
 
