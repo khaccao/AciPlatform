@@ -472,82 +472,18 @@ public class AuthController : ControllerBase
     /// Force-reseed: đồng bộ lại password admin và UserCompanies mapping.
     /// Dùng khi DB bị seed sai password hoặc thiếu UserCompanies.
     /// </summary>
-    [HttpPost("force-reseed")]
+    [HttpGet("force-reseed")]
     [AllowAnonymous]
     public async Task<IActionResult> ForceReseed()
     {
         try
         {
-            var results = new List<string>();
-
-            // 1. Reset password admin về đúng "Admin@123"
-            var admin = await _context.Users.FirstOrDefaultAsync(u => u.Username == "admin");
-            if (admin != null)
-            {
-                using var hmac = new System.Security.Cryptography.HMACSHA512();
-                admin.PasswordSalt = hmac.Key;
-                admin.PasswordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes("Admin@123"));
-                admin.IsDeleted = false;
-                admin.Status = 1;
-                _context.Users.Update(admin);
-                await _context.SaveChangesAsync();
-                results.Add("✅ Reset admin password → Admin@123");
-            }
-            else
-            {
-                results.Add("⚠️ User 'admin' không tồn tại trong DB");
-            }
-
-            // 2. Đảm bảo UserCompanies đúng cho tất cả users
-            var allUsers = await _context.Users.Where(u => !u.IsDeleted).ToListAsync();
-            var userMap = allUsers.ToDictionary(u => u.Username, u => u.Id);
-
-            var assignments = new (string Username, string CompanyCode)[]
-            {
-                ("admin",         "ACI"), ("admin",         "BHA"),
-                ("nguyen.van.an", "ACI"), ("tran.thi.binh", "ACI"),
-                ("le.van.cuong",  "ACI"), ("do.thi.phuong", "ACI"),
-                ("bha.admin",     "BHA"), ("pham.thi.dung", "BHA"),
-                ("hoang.van.em",  "BHA"), ("vu.van.giang",  "BHA"),
-            };
-
-            int ucAdded = 0;
-            foreach (var (username, code) in assignments)
-            {
-                if (!userMap.TryGetValue(username, out var uid)) continue;
-                bool exists = await _context.UserCompanies.AnyAsync(x => x.UserId == uid && x.CompanyCode == code);
-                if (!exists)
-                {
-                    _context.UserCompanies.Add(new AciPlatform.Domain.Entities.HoSoNhanSu.UserCompany { UserId = uid, CompanyCode = code });
-                    ucAdded++;
-                }
-            }
-            if (ucAdded > 0)
-            {
-                await _context.SaveChangesAsync();
-                results.Add($"✅ Added {ucAdded} UserCompany mappings");
-            }
-            else
-            {
-                results.Add("⏭️ UserCompanies đã đúng, không cần thêm");
-            }
-
-            // 3. Kiểm tra kết quả
-            var verifyUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == "admin");
-            var verifyUC = await _context.UserCompanies.Where(uc =>
-                _context.Users.Any(u => u.Username == "admin" && u.Id == uc.UserId)).ToListAsync();
-
-            return Ok(new
-            {
-                success = true,
-                results,
-                adminExists = verifyUser != null,
-                adminCompanies = verifyUC.Select(x => x.CompanyCode).ToList()
-            });
+            await AciPlatform.Infrastructure.Persistence.Seeders.DatabaseSeeder.SeedAllAsync(_context);
+            return Ok(new { message = "Database re-seeded successfully with latest menus and icons" });
         }
         catch (Exception ex)
         {
-            return Ok(new { success = false, message = ex.Message, stackTrace = ex.StackTrace });
+            return StatusCode(500, new { message = ex.Message, detail = ex.InnerException?.Message });
         }
     }
 
@@ -663,20 +599,6 @@ public class AuthController : ControllerBase
             UserCount = users.Count
         });
     }
-
-    [HttpGet("force-reseed")]
-    [AllowAnonymous]
-    public async Task<IActionResult> ForceReseed()
-    {
-        try
-        {
-            await AciPlatform.Infrastructure.Persistence.Seeders.DatabaseSeeder.SeedAllAsync(_context);
-            return Ok(new { message = "Database re-seeded successfully with latest menus and icons" });
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = ex.Message, detail = ex.InnerException?.Message });
-        }
     }
 }
 
