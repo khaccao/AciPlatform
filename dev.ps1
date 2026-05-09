@@ -88,10 +88,10 @@ function Setup-Environment {
     Write-Host "✅ Development environment configured!" -ForegroundColor Green
     Write-Host ""
     Write-Host "Database connection details:" -ForegroundColor Green
-    Write-Host "  Server: 14.225.212.145,1433" -ForegroundColor Cyan
+    Write-Host "  Server: 103.200.22.167,1433" -ForegroundColor Cyan
     Write-Host "  Database: AciPlatform" -ForegroundColor Cyan
-    Write-Host "  User: dev_user1" -ForegroundColor Cyan
-    Write-Host "  Password: Dev@123456" -ForegroundColor Cyan
+    Write-Host "  User: cao_admin" -ForegroundColor Cyan
+    Write-Host "  Password: Cao@Admin123!" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "Next steps:" -ForegroundColor Green
     Write-Host "  1. Run: .\dev.ps1 start" -ForegroundColor Cyan
@@ -106,7 +106,7 @@ function Start-Services {
     Write-Host "API will be available at: http://localhost:5000" -ForegroundColor Green
     Write-Host "Swagger docs at: http://localhost:5000/swagger" -ForegroundColor Green
     Write-Host ""
-    Write-Host "Database: 14.225.212.145:1433 (dev_user1/Dev@123456)" -ForegroundColor Yellow
+    Write-Host "Database: 103.200.22.167:1433 (cao_admin/Cao@Admin123!)" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "Press Ctrl+C to stop" -ForegroundColor Yellow
     Write-Host ""
