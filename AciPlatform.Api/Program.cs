@@ -160,6 +160,9 @@ await using (var scope = app.Services.CreateAsyncScope())
     }
 }
 
+app.MapGet("/ping", () => "pong");
+app.MapGet("/health", () => "healthy");
+
 app.Run();
 
 
