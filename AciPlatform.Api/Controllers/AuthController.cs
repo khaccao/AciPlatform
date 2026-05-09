@@ -173,10 +173,12 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            return Ok(new ObjectReturn
-            {
-                message = ex.Message,
-                status = 400
+            return StatusCode(500, new 
+            { 
+                status = 500,
+                message = ex.Message, 
+                detail = ex.InnerException?.Message, 
+                stackTrace = ex.StackTrace 
             });
         }
     }
@@ -383,14 +385,21 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> UsernameCheck([FromQuery] string username)
     {
-        if (string.IsNullOrWhiteSpace(username))
-            return BadRequest(new { message = "username is required" });
+        try
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                return BadRequest(new { message = "username is required" });
 
-        var companyCodes = await _userCompanyService.GetCompanyCodesByUsername(username.Trim());
-        if (!companyCodes.Any())
-            return NotFound(new { message = "User not found or no companies" });
+            var companyCodes = await _userCompanyService.GetCompanyCodesByUsername(username.Trim());
+            if (!companyCodes.Any())
+                return NotFound(new { message = "User not found or no companies" });
 
-        return Ok(new { username = username.Trim(), companyCodes });
+            return Ok(new { username = username.Trim(), companyCodes });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.Message, detail = ex.InnerException?.Message, stackTrace = ex.StackTrace });
+        }
     }
 
     [HttpPost("guess-login")]

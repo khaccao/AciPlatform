@@ -1,4 +1,4 @@
-﻿using AciPlatform.Application.Interfaces.HoSoNhanSu;
+using AciPlatform.Application.Interfaces.HoSoNhanSu;
 using AciPlatform.Domain.Entities.HoSoNhanSu;
 using Microsoft.EntityFrameworkCore;
 using AciPlatform.Application.Interfaces;
@@ -16,10 +16,19 @@ public class UserCompanyService : IUserCompanyService
 
     public async Task<List<string>> GetCompanyCodesByUsername(string username)
     {
-        return await (from uc in _context.UserCompanies
-                      join u in _context.Users on uc.UserId equals u.Id
-                      where u.Username == username && !u.IsDeleted
-                      select uc.CompanyCode).Distinct().ToListAsync();
+        if (string.IsNullOrEmpty(username)) return new List<string>();
+        
+        var user = await _context.Users
+            .Where(u => u.Username == username && !u.IsDeleted)
+            .FirstOrDefaultAsync();
+
+        if (user == null) return new List<string>();
+
+        return await _context.UserCompanies
+            .Where(uc => uc.UserId == user.Id)
+            .Select(uc => uc.CompanyCode)
+            .Distinct()
+            .ToListAsync();
     }
 
     public async Task<UserCompany> CreateAsync(int userId, string companyCode)
