@@ -52,4 +52,25 @@ public class Customer
     public DateTime? UpdatedDate { get; set; }
 
     public bool IsDeleted { get; set; } = false;
+
+    // ── Hotel / Property Management ──────────────────────────────
+    /// <summary>Đánh dấu Company này là một Khách sạn (Hotel = Company)</summary>
+    public bool IsHotel { get; set; } = false;
+
+    /// <summary>Loại khách sạn: HOTEL / RESORT / APARTMENT / MOTEL</summary>
+    [MaxLength(50)]
+    public string? HotelType { get; set; }
+
+    /// <summary>Connection string đến PMS database của khách sạn này (multi-tenant Dapper)</summary>
+    [MaxLength(1000)]
+    public string? PmsConnectionString { get; set; }
+
+    /// <summary>DMS Smart Lock App ID</summary>
+    [MaxLength(50)]
+    public string? DmsAppId { get; set; }
+
+    /// <summary>DMS Smart Lock App Secret</summary>
+    [MaxLength(100)]
+    public string? DmsAppSecret { get; set; }
 }
+

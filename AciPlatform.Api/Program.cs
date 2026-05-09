@@ -8,6 +8,10 @@ using AciPlatform.Application.Interfaces.LuongPhucLoi;
 using AciPlatform.Application.Interfaces.HopDong;
 using AciPlatform.Application.Interfaces.ChamCong;
 using AciPlatform.Application.Interfaces.HoSoNhanSu;
+using AciPlatform.Application.Interfaces.Hotel;
+using AciPlatform.Application.Services.Hotel;
+using AciPlatform.Application.Interfaces.HotelManagement;
+using AciPlatform.Infrastructure.Services.HotelManagement;
 using AciPlatform.Application.Interfaces.FleetTransportation;
 using AciPlatform.Application.Services.FleetTransportation;
 using AciPlatform.Application.Interfaces.MultiChannel;
@@ -73,6 +77,13 @@ builder.Services.AddScoped<IUserContractHistoryService, UserContractHistoryServi
 builder.Services.AddScoped<ITimeKeepingService, TimeKeepingService>();
 builder.Services.AddScoped<IUserCompanyService, UserCompanyService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
+builder.Services.AddScoped<IHotelService, HotelService>(); // Hotel = Company unified
+// ── Hotel Management Module ──────────────────────────────
+builder.Services.AddScoped<IHotelRoomService, HotelRoomService>();
+builder.Services.AddScoped<IHotelBookingService, HotelBookingService>();
+builder.Services.AddScoped<IHotelVehicleService, HotelVehicleService>();
+builder.Services.AddScoped<IHotelGuestService, HotelGuestService>();
+builder.Services.AddScoped<IHotelServiceCatalogService, HotelServiceCatalogService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<ICarFleetService, CarFleetService>();
@@ -96,6 +107,12 @@ builder.Services.AddDbContext<AciPlatform.Infrastructure.Persistence.Application
     var connectionString = connectionStringProvider.GetConnectionString();
     options.UseSqlServer(connectionString);
 });
+
+// Hotel Database (AciPlatform_Hotel — separate DB, no EF migrations needed)
+var hotelConnStr = builder.Configuration.GetConnectionString("HotelConnection")
+    ?? throw new InvalidOperationException("HotelConnection string not found in configuration.");
+builder.Services.AddDbContext<AciPlatform.Infrastructure.Persistence.HotelDbContext>(options =>
+    options.UseSqlServer(hotelConnStr));
 
 // Register IApplicationDbContext (Scoped)
 builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<AciPlatform.Infrastructure.Persistence.ApplicationDbContext>());
