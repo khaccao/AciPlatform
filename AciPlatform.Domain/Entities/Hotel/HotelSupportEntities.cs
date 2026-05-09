@@ -96,11 +96,19 @@ public class PmsRoom
     [MaxLength(10)] public string? Floor { get; set; }
     [MaxLength(50)] public string? KhuVucCode { get; set; }
     [MaxLength(50)] public string? BuildingID { get; set; }
+    public int? AreaId { get; set; }
     public int? SachBan { get; set; }
     public int? CleanDirty { get; set; }
     public int? Inspected { get; set; }
     public int? TinhTrang { get; set; }
     [MaxLength(20)] public string? Status { get; set; }
+    public int? MaxPerson { get; set; }
+    public decimal? BasePrice { get; set; }
+    [MaxLength(500)] public string? Description { get; set; }
+    [MaxLength(500)] public string? ImageUrl { get; set; }
     public bool IsActive { get; set; } = true;
+    public bool IsDeleted { get; set; } = false;
     public DateTime? SyncDate { get; set; }
+    public DateTime? UpdatedDate { get; set; }
 }
+
