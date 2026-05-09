@@ -1,4 +1,4 @@
-﻿using AciPlatform.Application.Interfaces;
+using AciPlatform.Application.Interfaces;
 using AciPlatform.Domain.Entities;
 using AciPlatform.Domain.Entities.HoSoNhanSu;
 using AciPlatform.Domain.Entities.LuongPhucLoi;
@@ -211,6 +211,21 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
                   .HasForeignKey(d => d.TaskId)
                   .OnDelete(DeleteBehavior.NoAction);
         });
+
+        // Configure decimals to avoid warnings
+        foreach (var property in modelBuilder.Model.GetEntityTypes()
+            .SelectMany(t => t.GetProperties())
+            .Where(p => p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?)))
+        {
+            if (property.Name.Contains("Latitude") || property.Name.Contains("Longitude"))
+            {
+                property.SetColumnType("decimal(12,9)");
+            }
+            else
+            {
+                property.SetColumnType("decimal(18,2)");
+            }
+        }
     }
 }
 

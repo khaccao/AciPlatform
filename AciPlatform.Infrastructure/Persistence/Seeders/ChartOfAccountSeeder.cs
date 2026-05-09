@@ -1,3 +1,4 @@
+using AciPlatform.Application.Interfaces;
 using AciPlatform.Domain.Entities.Ledger;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ namespace AciPlatform.Infrastructure.Persistence.Seeders;
 
 public static class ChartOfAccountSeeder
 {
-    public static async Task SeedAsync(ApplicationDbContext context, int year)
+    public static async Task SeedAsync(IApplicationDbContext context, int year)
     {
         if (await context.ChartOfAccounts.AnyAsync(c => c.Year == year))
             return; // Đã có dữ liệu thì bỏ qua
