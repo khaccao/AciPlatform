@@ -77,7 +77,8 @@ public class MenuService : IMenuService
             Approve = true,
             IsParent = x.IsParent ?? false,
             CodeParent = x.CodeParent,
-            Icon = x.Icon
+            Icon = x.Icon,
+            Url = x.Url
         });
     }
 

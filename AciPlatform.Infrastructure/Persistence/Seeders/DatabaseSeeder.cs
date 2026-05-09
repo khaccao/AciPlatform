@@ -134,46 +134,73 @@ public static class DatabaseSeeder
     {
         if (await context.Menus.AnyAsync()) { Console.WriteLine("⏭  Menus skipped."); return; }
 
-        context.Menus.AddRange(
-            new Menu { Code="dashboard", Name="Tổng quan",    NameEN="Dashboard",       Icon="dashboard",       IsParent=false, Order=1  },
-            new Menu { Code="hr",        Name="Nhân sự",      NameEN="Human Resources", Icon="people",          IsParent=true,  Order=2  },
-            new Menu { Code="accounting",Name="Kế toán",      NameEN="Accounting",      Icon="account_balance", IsParent=true,  Order=3  },
-            new Menu { Code="warehouse", Name="Kho hàng",     NameEN="Warehouse",       Icon="warehouse",       IsParent=true,  Order=4  },
-            new Menu { Code="sell",      Name="Bán hàng",     NameEN="Sales",           Icon="point_of_sale",   IsParent=false, Order=5  },
-            new Menu { Code="customer",  Name="Khách hàng",   NameEN="Customers",       Icon="person_pin",      IsParent=false, Order=6  },
-            new Menu { Code="goods",     Name="Hàng hóa",     NameEN="Goods",           Icon="inventory_2",     IsParent=false, Order=7  },
-            new Menu { Code="fleet",     Name="Quản lý Xe",   NameEN="Fleet",           Icon="local_shipping",  IsParent=false, Order=8  },
-            new Menu { Code="projects",  Name="Dự án R&D",    NameEN="Projects",        Icon="folder_special",  IsParent=true,  Order=9  },
-            new Menu { Code="dakenh",    Name="Đa kênh",      NameEN="Multi-Channel",   Icon="hub",             IsParent=true,  Order=10 },
-            new Menu { Code="system",    Name="Hệ thống",     NameEN="System",          Icon="settings",        IsParent=true,  Order=11 },
-            new Menu { Code="menus",     Name="Quản lý Menu", NameEN="Menu Management", Icon="menu_book",       IsParent=false, Order=12 }
-        );
+        var menus = new List<Menu>
+        {
+            new Menu { Code="dashboard", Name="Tổng quan",    NameEN="Dashboard",       Icon="LayoutDashboard", IsParent=false, Order=1, Url="/dashboard" },
+            new Menu { Code="hr",        Name="Nhân sự",      NameEN="Human Resources", Icon="Users",           IsParent=true,  Order=2, Url="/hr" },
+            new Menu { Code="accounting",Name="Kế toán",      NameEN="Accounting",      Icon="BookOpen",        IsParent=true,  Order=3, Url="/accounting" },
+            new Menu { Code="warehouse", Name="Kho hàng",     NameEN="Warehouse",       Icon="Warehouse",       IsParent=true,  Order=4, Url="/warehouse" },
+            new Menu { Code="sell",      Name="Bán hàng",     NameEN="Sales",           Icon="CreditCard",      IsParent=false, Order=5, Url="/sell" },
+            new Menu { Code="customer",  Name="Khách hàng",   NameEN="Customers",       Icon="Users",           IsParent=false, Order=6, Url="/customer" },
+            new Menu { Code="goods",     Name="Hàng hóa",     NameEN="Goods",           Icon="Package",         IsParent=false, Order=7, Url="/goods" },
+            new Menu { Code="fleet",     Name="Quản lý Xe",   NameEN="Fleet",           Icon="Truck",           IsParent=false, Order=8, Url="/fleet" },
+            new Menu { Code="projects",  Name="Dự án R&D",    NameEN="Projects",        Icon="Briefcase",       IsParent=true,  Order=9, Url="/projects" },
+            new Menu { Code="dakenh",    Name="Đa kênh",      NameEN="Multi-Channel",   Icon="Share2",          IsParent=true,  Order=10,Url="/dakenh" },
+            new Menu { Code="system",    Name="Hệ thống",     NameEN="System",          Icon="Settings",        IsParent=true,  Order=11,Url="/system" },
+            new Menu { Code="menus",     Name="Quản lý Menu", NameEN="Menu Management", Icon="List",            IsParent=false, Order=12,Url="/system/menus" }
+        };
+
+        foreach (var m in menus)
+        {
+            var existing = await context.Menus.FirstOrDefaultAsync(x => x.Code == m.Code);
+            if (existing == null) context.Menus.Add(m);
+            else { 
+                existing.Icon = m.Icon; 
+                existing.Url = m.Url; 
+                existing.IsParent = m.IsParent;
+                existing.Name = m.Name;
+            }
+        }
         await context.SaveChangesAsync();
 
-        context.Menus.AddRange(
-            new Menu { Code="hr/employees",       Name="Danh sách nhân viên", NameEN="Employees",      Icon="badge",                  CodeParent="hr",        IsParent=false, Order=1 },
-            new Menu { Code="hr/organization",    Name="Cơ cấu tổ chức",      NameEN="Organization",   Icon="account_tree",           CodeParent="hr",        IsParent=false, Order=2 },
-            new Menu { Code="hr/contracts",       Name="Hợp đồng lao động",   NameEN="Contracts",      Icon="description",            CodeParent="hr",        IsParent=false, Order=3 },
-            new Menu { Code="hr/timekeeping",     Name="Chấm công",            NameEN="Timekeeping",    Icon="schedule",               CodeParent="hr",        IsParent=false, Order=4 },
-            new Menu { Code="hr/face-attendance", Name="Điểm danh khuôn mặt", NameEN="Face Attendance",Icon="face",                   CodeParent="hr",        IsParent=false, Order=5 },
-            new Menu { Code="hr/salary",          Name="Bảng lương",           NameEN="Salary",         Icon="payments",               CodeParent="hr",        IsParent=false, Order=6 },
-            new Menu { Code="accounting/general-ledger",    Name="Sổ cái tổng hợp",   NameEN="General Ledger",    Icon="book",                   CodeParent="accounting",IsParent=false, Order=1 },
-            new Menu { Code="accounting/chart-of-accounts", Name="Hệ thống tài khoản", NameEN="Chart of Accounts", Icon="format_list_numbered",   CodeParent="accounting",IsParent=false, Order=2 },
-            new Menu { Code="accounting/receipt-voucher",   Name="Phiếu thu",          NameEN="Receipt Voucher",   Icon="receipt",                CodeParent="accounting",IsParent=false, Order=3 },
-            new Menu { Code="accounting/payment-voucher",   Name="Phiếu chi",          NameEN="Payment Voucher",   Icon="money_off",              CodeParent="accounting",IsParent=false, Order=4 },
-            new Menu { Code="accounting/approve-voucher",   Name="Duyệt chứng từ",     NameEN="Approve Voucher",   Icon="approval",               CodeParent="accounting",IsParent=false, Order=5 },
-            new Menu { Code="accounting/warehouse-receipt", Name="Phiếu nhập kho",     NameEN="Warehouse Receipt", Icon="input",                  CodeParent="accounting",IsParent=false, Order=6 },
-            new Menu { Code="accounting/suppliers",         Name="Nhà cung cấp",       NameEN="Suppliers",         Icon="business",               CodeParent="accounting",IsParent=false, Order=7 },
-            new Menu { Code="accounting/customer-debt",     Name="Công nợ khách hàng", NameEN="Customer Debt",     Icon="account_balance_wallet", CodeParent="accounting",IsParent=false, Order=8 },
-            new Menu { Code="warehouse/inventory",  Name="Tồn kho",    NameEN="Inventory",    Icon="inventory",            CodeParent="warehouse",IsParent=false, Order=1 },
-            new Menu { Code="warehouse/locations",  Name="Vị trí kho", NameEN="Locations",    Icon="location_on",          CodeParent="warehouse",IsParent=false, Order=2 },
-            new Menu { Code="projects/list", Name="Danh sách dự án", NameEN="Project List",Icon="view_list", CodeParent="projects",IsParent=false, Order=1 },
-            new Menu { Code="my-tasks",      Name="Việc của tôi",    NameEN="My Tasks",    Icon="task_alt",  CodeParent="projects",IsParent=false, Order=2 },
-            new Menu { Code="dakenh/facebook",Name="Facebook",       NameEN="Facebook",    Icon="facebook",  CodeParent="dakenh", IsParent=false, Order=1 },
-            new Menu { Code="system/roles",   Name="Phân quyền",     NameEN="Role Management",   Icon="admin_panel_settings",CodeParent="system",IsParent=false, Order=1 },
-            new Menu { Code="system/security",Name="Bảo mật nâng cao",NameEN="Advanced Security",Icon="security",           CodeParent="system",IsParent=false, Order=2 },
-            new Menu { Code="settings",       Name="Cài đặt",        NameEN="Settings",          Icon="tune",               CodeParent="system",IsParent=false, Order=3 }
-        );
+        var subMenus = new List<Menu>
+        {
+            new Menu { Code="hr/employees",       Name="Danh sách nhân viên", NameEN="Employees",      Icon="Users",          CodeParent="hr", IsParent=false, Order=1, Url="/hr/employees" },
+            new Menu { Code="hr/organization",    Name="Cơ cấu tổ chức",      NameEN="Organization",   Icon="GitBranch",      CodeParent="hr", IsParent=false, Order=2, Url="/hr/organization" },
+            new Menu { Code="hr/contracts",       Name="Hợp đồng lao động",   NameEN="Contracts",      Icon="FileText",       CodeParent="hr", IsParent=false, Order=3, Url="/hr/contracts" },
+            new Menu { Code="hr/timekeeping",     Name="Chấm công",            NameEN="Timekeeping",    Icon="Clock",          CodeParent="hr", IsParent=false, Order=4, Url="/hr/timekeeping" },
+            new Menu { Code="hr/face-attendance", Name="Điểm danh khuôn mặt", NameEN="Face Attendance",Icon="Camera",         CodeParent="hr", IsParent=false, Order=5, Url="/hr/face-attendance" },
+            new Menu { Code="hr/salary",          Name="Bảng lương",           NameEN="Salary",         Icon="Wallet",         CodeParent="hr", IsParent=false, Order=6, Url="/hr/salary" },
+            
+            new Menu { Code="accounting/general-ledger",    Name="Sổ cái tổng hợp",   NameEN="General Ledger",    Icon="BookOpen",       CodeParent="accounting",IsParent=false, Order=1, Url="/accounting/general-ledger" },
+            new Menu { Code="accounting/chart-of-accounts", Name="Hệ thống tài khoản", NameEN="Chart of Accounts", Icon="List",           CodeParent="accounting",IsParent=false, Order=2, Url="/accounting/chart-of-accounts" },
+            new Menu { Code="accounting/receipt-voucher",   Name="Phiếu thu",          NameEN="Receipt Voucher",   Icon="CreditCard",     CodeParent="accounting",IsParent=false, Order=3, Url="/accounting/receipt-voucher" },
+            new Menu { Code="accounting/payment-voucher",   Name="Phiếu chi",          NameEN="Payment Voucher",   Icon="FileText",       CodeParent="accounting",IsParent=false, Order=4, Url="/accounting/payment-voucher" },
+            new Menu { Code="accounting/approve-voucher",   Name="Duyệt chứng từ",     NameEN="Approve Voucher",   Icon="ClipboardCheck", CodeParent="accounting",IsParent=false, Order=5, Url="/accounting/approve-voucher" },
+            new Menu { Code="accounting/warehouse-receipt", Name="Phiếu nhập kho",     NameEN="Warehouse Receipt", Icon="PackagePlus",    CodeParent="accounting",IsParent=false, Order=6, Url="/accounting/warehouse-receipt" },
+            new Menu { Code="accounting/suppliers",         Name="Nhà cung cấp",       NameEN="Suppliers",         Icon="Users",          CodeParent="accounting",IsParent=false, Order=7, Url="/accounting/suppliers" },
+            new Menu { Code="accounting/customer-debt",     Name="Công nợ khách hàng", NameEN="Customer Debt",     Icon="Wallet",         CodeParent="accounting",IsParent=false, Order=8, Url="/accounting/customer-debt" },
+            
+            new Menu { Code="warehouse/inventory",  Name="Tồn kho",    NameEN="Inventory",    Icon="Package",      CodeParent="warehouse",IsParent=false, Order=1, Url="/warehouse/inventory" },
+            new Menu { Code="warehouse/locations",  Name="Vị trí kho", NameEN="Locations",    Icon="Layers",       CodeParent="warehouse",IsParent=false, Order=2, Url="/warehouse/locations" },
+            
+            new Menu { Code="projects/list", Name="Danh sách dự án", NameEN="Project List",Icon="List",     CodeParent="projects",IsParent=false, Order=1, Url="/projects/list" },
+            new Menu { Code="my-tasks",      Name="Việc của tôi",    NameEN="My Tasks",    Icon="CheckSquare", CodeParent="projects",IsParent=false, Order=2, Url="/projects/my-tasks" },
+            new Menu { Code="system/roles",   Name="Phân quyền",     NameEN="Role Management",   Icon="ShieldCheck", CodeParent="system",IsParent=false, Order=1, Url="/system/roles" },
+            new Menu { Code="system/security",Name="Bảo mật nâng cao",NameEN="Advanced Security",Icon="Shield",      CodeParent="system",IsParent=false, Order=2, Url="/system/security" }
+        };
+
+        foreach (var m in subMenus)
+        {
+            var existing = await context.Menus.FirstOrDefaultAsync(x => x.Code == m.Code);
+            if (existing == null) context.Menus.Add(m);
+            else { 
+                existing.Icon = m.Icon; 
+                existing.Url = m.Url; 
+                existing.CodeParent = m.CodeParent;
+                existing.Name = m.Name;
+            }
+        }
         await context.SaveChangesAsync();
         Console.WriteLine("✅ Seeded 34 Menus");
     }

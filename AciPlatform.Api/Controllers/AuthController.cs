@@ -663,6 +663,21 @@ public class AuthController : ControllerBase
             UserCount = users.Count
         });
     }
+
+    [HttpGet("force-reseed")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ForceReseed()
+    {
+        try
+        {
+            await AciPlatform.Infrastructure.Persistence.Seeders.DatabaseSeeder.SeedAllAsync(_context);
+            return Ok(new { message = "Database re-seeded successfully with latest menus and icons" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.Message, detail = ex.InnerException?.Message });
+        }
+    }
 }
 
 

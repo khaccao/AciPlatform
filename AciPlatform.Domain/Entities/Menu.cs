@@ -34,4 +34,7 @@ public class Menu
 
     [MaxLength(100)]
     public string? Icon { get; set; }
+
+    [MaxLength(255)]
+    public string? Url { get; set; }
 }
