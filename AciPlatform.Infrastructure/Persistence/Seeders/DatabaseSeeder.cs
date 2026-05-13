@@ -102,7 +102,7 @@ public static class DatabaseSeeder
 
         var assignments = new (int UserId, string CompanyCode)[]
         {
-            (Uid("admin"),         "ACI"), (Uid("admin"),         "BHA"),
+            (Uid("admin"),         "ACI"), (Uid("admin"),         "BHA"), (Uid("admin"),         "HOMEHG"),
             (Uid("nguyen.van.an"), "ACI"), (Uid("tran.thi.binh"), "ACI"),
             (Uid("le.van.cuong"),  "ACI"), (Uid("do.thi.phuong"), "ACI"),
             (Uid("bha.admin"),     "BHA"), (Uid("pham.thi.dung"), "BHA"),
@@ -304,9 +304,10 @@ public static class DatabaseSeeder
             Console.WriteLine("✅ Seeded 7 Departments");
         }
 
-        // Companies (ACI, BHA) stored in Customers table
+        // Companies stored in Customers table. Hotel companies still live here;
+        // their hotel operational data is keyed by the same code in AciPlatform_Hotel.
         var existCodes = await context.Customers
-            .Where(c => new[]{"ACI","BHA"}.Contains(c.Code)).Select(c => c.Code).ToListAsync();
+            .Where(c => new[]{"ACI","BHA","HOMEHG"}.Contains(c.Code)).Select(c => c.Code).ToListAsync();
 
         if (!existCodes.Contains("ACI"))
             context.Customers.Add(new Customer { Code="ACI", Name="Công ty Cổ phần ACI Technology",
@@ -317,6 +318,22 @@ public static class DatabaseSeeder
             context.Customers.Add(new Customer { Code="BHA", Name="Công ty TNHH BHA Solutions",
                 Phone="0281234568", Email="contact@bha.vn", Address="456 Lê Đại Hành, Q.11, TP.HCM",
                 IsDeleted=false, CreatedDate=DateTime.Now });
+
+        if (!existCodes.Contains("HOMEHG"))
+            context.Customers.Add(new Customer { Code="HOMEHG", Name="Home HG - Nha Nghi Ha Giang",
+                Phone="", Email="", Address="Ha Giang",
+                IsHotel=true, HotelType="HOTEL", IsDeleted=false, CreatedDate=DateTime.Now });
+        else
+        {
+            var homeHg = await context.Customers.FirstOrDefaultAsync(c => c.Code == "HOMEHG");
+            if (homeHg != null)
+            {
+                homeHg.IsHotel = true;
+                homeHg.HotelType = "HOTEL";
+                homeHg.IsDeleted = false;
+                homeHg.UpdatedDate = DateTime.Now;
+            }
+        }
 
         await context.SaveChangesAsync();
 

@@ -12,6 +12,7 @@ public class CreateBookingRequest
     // Khách
     public string GuestName { get; set; } = string.Empty;
     public string? GuestPhone { get; set; }
+    public string? GuestEmail { get; set; }
     public string? GuestIdCard { get; set; }
     public string? Nationality { get; set; } = "Việt Nam";
     // Thời gian
@@ -123,6 +124,7 @@ public interface IHotelBookingService
 
     /// <summary>Cập nhật thông tin booking (giá, notes, dịch vụ)</summary>
     Task<BookingDto> UpdateBookingAsync(int id, CreateBookingRequest request);
+    Task<BookingDto> AddBookingServiceAsync(int bookingId, AddBookingServiceRequest req);
 
     /// <summary>Xóa booking (soft delete)</summary>
     Task DeleteBookingAsync(int id);
@@ -135,6 +137,41 @@ public interface IHotelBookingService
 
     /// <summary>Tạo invoice từ booking</summary>
     Task<HotelInvoiceDto> GenerateInvoiceAsync(int bookingId, string paymentMethod);
+
+    // ── Catalog & Mapping ─────────────────────────────────────
+    Task<List<HotelServiceDto>> GetServicesAsync(string hotelCode, string? category = null);
+    Task<HotelServiceDto> UpsertServiceAsync(HotelServiceDto req);
+    Task DeleteServiceAsync(int id);
+
+    Task<List<HotelAreaDto>> GetAreasAsync(string hotelCode);
+    Task<HotelAreaDto> UpsertAreaAsync(HotelAreaDto req);
+    Task DeleteAreaAsync(int id);
+
+    Task<List<HotelElementDto>> GetElementsAsync(string hotelCode, int? areaId = null);
+    Task<HotelElementDto> UpsertElementAsync(HotelElementDto req);
+    Task DeleteElementAsync(int id);
+}
+
+public class HotelAreaDto
+{
+    public int Id { get; set; }
+    public string HotelCode { get; set; } = string.Empty;
+    public int? ParentId { get; set; }
+    public string AreaName { get; set; } = string.Empty;
+    public string? AreaType { get; set; }
+    public string? Color { get; set; }
+}
+
+public class HotelElementDto
+{
+    public int Id { get; set; }
+    public string HotelCode { get; set; } = string.Empty;
+    public int AreaId { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Type { get; set; } = "ROOM";
+    public string Status { get; set; } = "VC";
+    public int? Capacity { get; set; }
+    public string? Color { get; set; }
 }
 
 public class HotelInvoiceDto
@@ -147,4 +184,13 @@ public class HotelInvoiceDto
     public string PaymentMethod { get; set; } = "CASH";
     public string Status { get; set; } = "UNPAID";
     public DateTime IssuedDate { get; set; }
+}
+
+public class AddBookingServiceRequest
+{
+    public string ServiceCode { get; set; } = string.Empty;
+    public string? ServiceName { get; set; }
+    public string? Category { get; set; }
+    public decimal Quantity { get; set; } = 1;
+    public decimal UnitPrice { get; set; } = 0;
 }

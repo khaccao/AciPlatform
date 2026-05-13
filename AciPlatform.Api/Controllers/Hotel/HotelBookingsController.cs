@@ -62,6 +62,11 @@ public class HotelBookingsController : ControllerBase
     public async Task<IActionResult> Update(int id, [FromBody] CreateBookingRequest req)
         => Ok(await _svc.UpdateBookingAsync(id, req));
 
+    /// POST /api/hotel-bookings/{id}/services — Thêm dịch vụ/minibar
+    [HttpPost("{id:int}/services")]
+    public async Task<IActionResult> AddService(int id, [FromBody] AddBookingServiceRequest req)
+        => Ok(await _svc.AddBookingServiceAsync(id, req));
+
     /// PATCH /api/hotel-bookings/{id}/status — Check-in / Check-out / Cancel
     [HttpPatch("{id:int}/status")]
     public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateBookingStatusRequest req)
@@ -98,6 +103,41 @@ public class HotelBookingsController : ControllerBase
     [HttpPost("{id:int}/invoice")]
     public async Task<IActionResult> GenerateInvoice(int id, [FromBody] InvoiceRequest req)
         => Ok(await _svc.GenerateInvoiceAsync(id, req.PaymentMethod));
+
+    // ── Catalog & Mapping Endpoints ───────────────────────────
+    
+    [HttpGet("{hotelCode}/services")]
+    public async Task<IActionResult> GetServices(string hotelCode, [FromQuery] string? category)
+        => Ok(await _svc.GetServicesAsync(hotelCode, category));
+
+    [HttpPost("services")]
+    public async Task<IActionResult> UpsertService([FromBody] HotelServiceDto req)
+        => Ok(await _svc.UpsertServiceAsync(req));
+
+    [HttpDelete("services/{id:int}")]
+    public async Task<IActionResult> DeleteService(int id) { await _svc.DeleteServiceAsync(id); return Ok(); }
+
+    [HttpGet("{hotelCode}/areas")]
+    public async Task<IActionResult> GetAreas(string hotelCode)
+        => Ok(await _svc.GetAreasAsync(hotelCode));
+
+    [HttpPost("areas")]
+    public async Task<IActionResult> UpsertArea([FromBody] HotelAreaDto req)
+        => Ok(await _svc.UpsertAreaAsync(req));
+
+    [HttpDelete("areas/{id:int}")]
+    public async Task<IActionResult> DeleteArea(int id) { await _svc.DeleteAreaAsync(id); return Ok(); }
+
+    [HttpGet("{hotelCode}/elements")]
+    public async Task<IActionResult> GetElements(string hotelCode, [FromQuery] int? areaId)
+        => Ok(await _svc.GetElementsAsync(hotelCode, areaId));
+
+    [HttpPost("elements")]
+    public async Task<IActionResult> UpsertElement([FromBody] HotelElementDto req)
+        => Ok(await _svc.UpsertElementAsync(req));
+
+    [HttpDelete("elements/{id:int}")]
+    public async Task<IActionResult> DeleteElement(int id) { await _svc.DeleteElementAsync(id); return Ok(); }
 }
 
 public class InvoiceRequest { public string PaymentMethod { get; set; } = "CASH"; }

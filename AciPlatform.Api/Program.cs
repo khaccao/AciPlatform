@@ -86,6 +86,7 @@ builder.Services.AddScoped<IHotelGuestService, HotelGuestService>();
 builder.Services.AddScoped<IHotelServiceCatalogService, HotelServiceCatalogService>();
 builder.Services.AddScoped<IHotelPropertyService, HotelPropertyService>();
 builder.Services.AddScoped<IHotelTourService, HotelTourService>();
+builder.Services.AddScoped<IHotelGuideService, HotelGuideService>();
 builder.Services.AddScoped<IHotelReportService, HotelReportService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<ICarService, CarService>();
@@ -173,6 +174,10 @@ await using (var scope = app.Services.CreateAsyncScope())
 
         // Seed initial data (idempotent – chạy an toàn nhiều lần)
         await AciPlatform.Infrastructure.Persistence.Seeders.DatabaseSeeder.SeedAllAsync(context);
+
+        var hotelContext = services.GetRequiredService<AciPlatform.Infrastructure.Persistence.HotelDbContext>();
+        await AciPlatform.Infrastructure.Persistence.HotelSchemaPatcher.ApplyAsync(hotelContext);
+        Console.WriteLine("Hotel database schema checked successfully.");
     }
     catch (Exception ex)
     {

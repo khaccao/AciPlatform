@@ -58,6 +58,7 @@ public class HotelVehicleRental
     [MaxLength(20)] public string? ConditionIn { get; set; }
     [MaxLength(500)] public string? DamageNotes { get; set; }
     [MaxLength(20)] public string Status { get; set; } = "ACTIVE";
+    public decimal PaidAmount { get; set; } = 0;
     [MaxLength(500)] public string? Notes { get; set; }
     public int? CreatedBy { get; set; }
     public bool IsDeleted { get; set; } = false;

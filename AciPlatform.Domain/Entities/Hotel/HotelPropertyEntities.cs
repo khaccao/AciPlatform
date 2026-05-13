@@ -102,6 +102,7 @@ public class HotelElement
     [MaxLength(20)] public string? Color { get; set; }
     [MaxLength(10)] public string? Icon { get; set; }
     [MaxLength(4000)] public string? Settings { get; set; }
+    [MaxLength(20)] public string Status { get; set; } = "VC"; // VC, VD, OC, OD, EA, ED, ED/EA
     public bool IsActive { get; set; } = true;
     public bool IsOccupied { get; set; } = false;
     public DateTime CreatedDate { get; set; } = DateTime.Now;

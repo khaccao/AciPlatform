@@ -18,6 +18,8 @@ public class HotelGuest
     [MaxLength(100)] public string? Nationality { get; set; } = "Việt Nam";
     public DateOnly? DateOfBirth { get; set; }
     [MaxLength(10)] public string? Gender { get; set; }
+    [MaxLength(500)] public string? Avatar { get; set; }
+    [MaxLength(500)] public string? IdentityDocumentImage { get; set; }
     [MaxLength(500)] public string? Address { get; set; }
     [MaxLength(50)] public string? PreferRoomType { get; set; }
     [MaxLength(50)] public string? PreferVehicle { get; set; }

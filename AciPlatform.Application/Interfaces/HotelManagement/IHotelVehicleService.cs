@@ -6,15 +6,15 @@ public class HotelVehicleDto
 {
     public int Id { get; set; }
     public string VehicleCode { get; set; } = string.Empty;
-    public string? BienSo { get; set; }
-    public string TenXe { get; set; } = string.Empty;
+    public string? LicensePlate { get; set; }
+    public string VehicleName { get; set; } = string.Empty;
     public string VehicleType { get; set; } = string.Empty;
     public string? Brand { get; set; }
     public string? Model { get; set; }
     public string? Color { get; set; }
     public int? YearMade { get; set; }
     public decimal PricePerDay { get; set; }
-    public decimal DepositRequired { get; set; }
+    public decimal DepositAmount { get; set; }
     public int FuelLevel { get; set; }
     public string Condition { get; set; } = "GOOD";
     public string Status { get; set; } = "AVAILABLE";
@@ -26,8 +26,8 @@ public class CreateVehicleRequest
 {
     public string HotelCode { get; set; } = string.Empty;
     public string VehicleCode { get; set; } = string.Empty;
-    public string? BienSo { get; set; }
-    public string TenXe { get; set; } = string.Empty;
+    public string? LicensePlate { get; set; }
+    public string VehicleName { get; set; } = string.Empty;
     public string VehicleType { get; set; } = "MOTORBIKE_MANUAL";
     public string? ServiceCode { get; set; }
     public string? Brand { get; set; }
@@ -35,7 +35,7 @@ public class CreateVehicleRequest
     public string? Color { get; set; }
     public int? YearMade { get; set; }
     public decimal PricePerDay { get; set; } = 0;
-    public decimal DepositRequired { get; set; } = 0;
+    public decimal DepositAmount { get; set; } = 0;
     public string? Notes { get; set; }
 }
 
@@ -60,12 +60,12 @@ public class ReturnVehicleRequest
 {
     public string HotelCode { get; set; } = string.Empty;
     public int RentalId { get; set; }
-    public DateTime ActualReturnDate { get; set; }
+    public DateTime? ActualReturnDate { get; set; }
     public int FuelLevelIn { get; set; }
     public string ConditionIn { get; set; } = "GOOD";
     public decimal DamageFee { get; set; } = 0;
     public decimal DepositReturned { get; set; } = 0;
-    public string? DamageNotes { get; set; }
+    public string? Notes { get; set; }
 }
 
 public class HotelVehicleRentalDto
@@ -73,8 +73,8 @@ public class HotelVehicleRentalDto
     public int Id { get; set; }
     public string RentalCode { get; set; } = string.Empty;
     public string VehicleCode { get; set; } = string.Empty;
-    public string? BienSo { get; set; }
-    public string? TenXe { get; set; }
+    public string? LicensePlate { get; set; }
+    public string? VehicleName { get; set; }
     public string GuestName { get; set; } = string.Empty;
     public string? GuestPhone { get; set; }
     public DateTime RentFrom { get; set; }
@@ -83,6 +83,7 @@ public class HotelVehicleRentalDto
     public decimal TotalDays { get; set; }
     public decimal PricePerDay { get; set; }
     public decimal TotalAmount { get; set; }
+    public decimal PaidAmount { get; set; }
     public decimal DepositAmount { get; set; }
     public decimal DepositReturned { get; set; }
     public decimal DamageFee { get; set; }
@@ -162,6 +163,7 @@ public interface IHotelGuestService
 public class HotelServiceDto
 {
     public int Id { get; set; }
+    public string HotelCode { get; set; } = string.Empty;
     public string ServiceCode { get; set; } = string.Empty;
     public string ServiceName { get; set; } = string.Empty;
     public string? ServiceNameEN { get; set; }

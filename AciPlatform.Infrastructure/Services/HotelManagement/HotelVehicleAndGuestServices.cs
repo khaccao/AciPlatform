@@ -28,10 +28,10 @@ public class HotelVehicleService : IHotelVehicleService
     {
         var v = new HotelVehicle
         {
-            HotelCode = req.HotelCode, VehicleCode = req.VehicleCode, BienSo = req.BienSo,
-            TenXe = req.TenXe, VehicleType = req.VehicleType, ServiceCode = req.ServiceCode,
+            HotelCode = req.HotelCode, VehicleCode = req.VehicleCode, BienSo = req.LicensePlate,
+            TenXe = req.VehicleName, VehicleType = req.VehicleType, ServiceCode = req.ServiceCode,
             Brand = req.Brand, Model = req.Model, Color = req.Color, YearMade = req.YearMade,
-            PricePerDay = req.PricePerDay, DepositRequired = req.DepositRequired, Notes = req.Notes
+            PricePerDay = req.PricePerDay, DepositRequired = req.DepositAmount, Notes = req.Notes
         };
         _db.HotelVehicles.Add(v);
         await _db.SaveChangesAsync();
@@ -41,9 +41,9 @@ public class HotelVehicleService : IHotelVehicleService
     public async Task<HotelVehicleDto> UpdateVehicleAsync(int id, CreateVehicleRequest req)
     {
         var v = await _db.HotelVehicles.FindAsync(id) ?? throw new InvalidOperationException("Vehicle not found.");
-        v.BienSo = req.BienSo; v.TenXe = req.TenXe; v.VehicleType = req.VehicleType;
+        v.BienSo = req.LicensePlate; v.TenXe = req.VehicleName; v.VehicleType = req.VehicleType;
         v.Brand = req.Brand; v.Model = req.Model; v.Color = req.Color; v.YearMade = req.YearMade;
-        v.PricePerDay = req.PricePerDay; v.DepositRequired = req.DepositRequired;
+        v.PricePerDay = req.PricePerDay; v.DepositRequired = req.DepositAmount;
         v.Notes = req.Notes; v.UpdatedDate = DateTime.Now;
         await _db.SaveChangesAsync();
         return ToDto(v);
@@ -102,12 +102,12 @@ public class HotelVehicleService : IHotelVehicleService
         var vehicle = await _db.HotelVehicles.FirstOrDefaultAsync(v =>
             v.HotelCode == rental.HotelCode && v.VehicleCode == rental.VehicleCode);
 
-        rental.ActualReturnDate = req.ActualReturnDate;
+        rental.ActualReturnDate = req.ActualReturnDate ?? DateTime.Now;
         rental.FuelLevelIn = req.FuelLevelIn;
         rental.ConditionIn = req.ConditionIn;
         rental.DamageFee = req.DamageFee;
         rental.DepositReturned = req.DepositReturned;
-        rental.DamageNotes = req.DamageNotes;
+        rental.DamageNotes = req.Notes;
         rental.Status = "RETURNED";
         rental.UpdatedDate = DateTime.Now;
 
@@ -161,20 +161,23 @@ public class HotelVehicleService : IHotelVehicleService
 
     private static HotelVehicleDto ToDto(HotelVehicle v) => new()
     {
-        Id = v.Id, VehicleCode = v.VehicleCode, BienSo = v.BienSo, TenXe = v.TenXe,
+        Id = v.Id, VehicleCode = v.VehicleCode, LicensePlate = v.BienSo, VehicleName = v.TenXe,
         VehicleType = v.VehicleType, Brand = v.Brand, Model = v.Model, Color = v.Color,
-        YearMade = v.YearMade, PricePerDay = v.PricePerDay, DepositRequired = v.DepositRequired,
+        YearMade = v.YearMade, PricePerDay = v.PricePerDay, DepositAmount = v.DepositRequired,
         FuelLevel = v.FuelLevel, Condition = v.Condition, Status = v.Status, Notes = v.Notes
     };
 
     private static HotelVehicleRentalDto ToRentalDto(HotelVehicleRental r, HotelVehicle? v) => new()
     {
         Id = r.Id, RentalCode = r.RentalCode, VehicleCode = r.VehicleCode,
-        BienSo = v?.BienSo, TenXe = v?.TenXe,
+        LicensePlate = v?.BienSo, VehicleName = v?.TenXe,
         GuestName = r.GuestName, GuestPhone = r.GuestPhone,
         RentFrom = r.RentFrom, RentTo = r.RentTo, ActualReturnDate = r.ActualReturnDate,
-        TotalDays = r.TotalDays, PricePerDay = r.PricePerDay, TotalAmount = r.TotalAmount,
-        DepositAmount = r.DepositAmount, DepositReturned = r.DepositReturned, DamageFee = r.DamageFee,
+        TotalDays = r.TotalDays, PricePerDay = r.PricePerDay,
+        TotalAmount = r.TotalAmount,
+        PaidAmount = r.PaidAmount,
+        DepositAmount = r.DepositAmount,
+        DepositReturned = r.DepositReturned, DamageFee = r.DamageFee,
         Status = r.Status, IsOverdue = r.Status == "ACTIVE" && r.RentTo < DateTime.Now
     };
 }

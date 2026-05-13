@@ -71,31 +71,34 @@ public class HotelPropertyService : IHotelPropertyService
     public async Task<List<AreaDto>> GetAreasTreeAsync(string hotelCode)
     {
         var all = await _db.HotelAreas.Where(a => a.HotelCode == hotelCode && a.IsActive)
-            .Include(a => a.Elements).OrderBy(a => a.AreaCode).ToListAsync();
+            .OrderBy(a => a.AreaCode).ToListAsync();
         var rooms = await _db.PmsRooms.Where(r => r.HotelCode == hotelCode && r.IsActive).ToListAsync();
-        return all.Where(a => a.ParentId == null).Select(r => BuildAreaTree(r, all, rooms)).ToList();
+        var elements = await _db.HotelElements.Where(e => e.HotelCode == hotelCode && e.IsActive).ToListAsync();
+        return all.Where(a => a.ParentId == null).Select(r => BuildAreaTree(r, all, rooms, elements)).ToList();
     }
 
-    private AreaDto BuildAreaTree(HotelArea area, List<HotelArea> all, List<PmsRoom> rooms)
+    private AreaDto BuildAreaTree(HotelArea area, List<HotelArea> all, List<PmsRoom> rooms, List<HotelElement>? elements = null)
     {
         var children = all.Where(a => a.ParentId == area.Id).ToList();
         var areaRooms = rooms.Where(r => r.KhuVucCode == area.AreaCode).ToList();
+        var areaElements = elements?.Where(e => e.AreaId == area.Id).ToList() ?? area.Elements.ToList();
         return new AreaDto
         {
             Id = area.Id, Guid = area.Guid, HotelCode = area.HotelCode, ParentId = area.ParentId,
             AreaCode = area.AreaCode, AreaName = area.AreaName, AreaType = area.AreaType,
             Color = area.Color, AreaDescription = area.AreaDescription, IsActive = area.IsActive,
             RoomCount = areaRooms.Count,
-            Children = children.Select(c => BuildAreaTree(c, all, rooms)).ToList(),
-            Elements = area.Elements.Select(e => new ElementDto { Id = e.Id, Guid = e.Guid, Name = e.Name,
+            Children = children.Select(c => BuildAreaTree(c, all, rooms, elements)).ToList(),
+            Elements = areaElements.Select(e => new ElementDto { Id = e.Id, Guid = e.Guid, Name = e.Name,
                 Alias = e.Alias, Type = e.Type, Capacity = e.Capacity, Color = e.Color, Icon = e.Icon, IsOccupied = e.IsOccupied }).ToList()
         };
     }
 
     public async Task<AreaDto?> GetAreaByIdAsync(int id)
-    { var a = await _db.HotelAreas.Include(x => x.Elements).FirstOrDefaultAsync(x => x.Id == id);
+    { var a = await _db.HotelAreas.FirstOrDefaultAsync(x => x.Id == id);
       if (a == null) return null;
-      return BuildAreaTree(a, new List<HotelArea>(), new List<PmsRoom>()); }
+      var elements = await _db.HotelElements.Where(e => e.AreaId == id && e.IsActive).ToListAsync();
+      return BuildAreaTree(a, new List<HotelArea>(), new List<PmsRoom>(), elements); }
 
     public async Task<AreaDto> CreateAreaAsync(UpsertAreaRequest req)
     {

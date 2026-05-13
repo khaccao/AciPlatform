@@ -43,19 +43,30 @@ public class HotelTourGuide
     [Key] public int Id { get; set; }
     public Guid Guid { get; set; } = Guid.NewGuid();
     [MaxLength(50)] public string HotelCode { get; set; } = string.Empty;
+    [MaxLength(20)] public string? GuideCode { get; set; }
     [Required, MaxLength(200)] public string Name { get; set; } = string.Empty;
     [MaxLength(20)] public string? Phone { get; set; }
     [MaxLength(200)] public string? Email { get; set; }
     [MaxLength(200)] public string? Languages { get; set; }     // JSON: ["vi","en"]
     [MaxLength(200)] public string? Speciality { get; set; }    // Loop/Trek/Cultural/Car
-    public bool IsFreelance { get; set; } = false;
+    public bool IsFreelance { get; set; } = true;
     public decimal DailyRate { get; set; } = 0;
     [MaxLength(1000)] public string? Bio { get; set; }
     [MaxLength(500)] public string? ImageUrl { get; set; }
     public bool IsActive { get; set; } = true;
     public bool IsDeleted { get; set; } = false;
+    // HR integration
+    public int? HrEmployeeId { get; set; }
+    [MaxLength(30)] public string? IdCard { get; set; }
+    [MaxLength(500)] public string? Address { get; set; }
+    public DateOnly? BirthDate { get; set; }
+    [MaxLength(20)] public string ContractType { get; set; } = "FREELANCE"; // FREELANCE | FULLTIME | PARTTIME
+    public decimal MonthlyBaseSalary { get; set; } = 0;
     public DateTime CreatedDate { get; set; } = DateTime.Now;
     public DateTime? UpdatedDate { get; set; }
+    // Navigation
+    public ICollection<PmsTourGuideContract> Contracts { get; set; } = new List<PmsTourGuideContract>();
+    public ICollection<PmsTourGuideSalary> Salaries { get; set; } = new List<PmsTourGuideSalary>();
 }
 
 [Table("HotelTourSchedules")]
@@ -91,4 +102,50 @@ public class HotelGroupMember
     [MaxLength(20)] public string Status { get; set; } = "PENDING";
     [MaxLength(500)] public string? Notes { get; set; }
     public DateTime CreatedDate { get; set; } = DateTime.Now;
+}
+
+// ── Guide Contract ────────────────────────────────────────────
+[Table("PmsTourGuideContracts")]
+public class PmsTourGuideContract
+{
+    [Key] public int Id { get; set; }
+    [MaxLength(50)] public string HotelCode { get; set; } = string.Empty;
+    public int GuideId { get; set; }
+    [MaxLength(30)] public string ContractCode { get; set; } = string.Empty;
+    [MaxLength(20)] public string ContractType { get; set; } = "FREELANCE";
+    public DateOnly StartDate { get; set; }
+    public DateOnly? EndDate { get; set; }
+    public decimal BasicSalary { get; set; } = 0;
+    public decimal DailyRate { get; set; } = 0;
+    [MaxLength(20)] public string Status { get; set; } = "ACTIVE"; // ACTIVE | EXPIRED | TERMINATED
+    [MaxLength(500)] public string? Notes { get; set; }
+    public DateTime CreatedDate { get; set; } = DateTime.Now;
+    public DateTime? UpdatedDate { get; set; }
+    // Navigation
+    [ForeignKey("GuideId")] public HotelTourGuide? Guide { get; set; }
+}
+
+// ── Guide Salary ──────────────────────────────────────────────
+[Table("PmsTourGuideSalaries")]
+public class PmsTourGuideSalary
+{
+    [Key] public int Id { get; set; }
+    [MaxLength(50)] public string HotelCode { get; set; } = string.Empty;
+    public int GuideId { get; set; }
+    public int Month { get; set; }
+    public int Year { get; set; }
+    public int TourCount { get; set; } = 0;
+    public decimal DailyRate { get; set; } = 0;
+    public decimal TourIncome { get; set; } = 0;
+    public decimal BasicSalary { get; set; } = 0;
+    public decimal Bonus { get; set; } = 0;
+    public decimal Deductions { get; set; } = 0;
+    public decimal TotalPay { get; set; } = 0;
+    [MaxLength(20)] public string Status { get; set; } = "PENDING"; // PENDING | APPROVED | PAID
+    public DateTime? PaidAt { get; set; }
+    [MaxLength(500)] public string? Notes { get; set; }
+    public DateTime CreatedDate { get; set; } = DateTime.Now;
+    public DateTime? UpdatedDate { get; set; }
+    // Navigation
+    [ForeignKey("GuideId")] public HotelTourGuide? Guide { get; set; }
 }

@@ -31,6 +31,20 @@ public class HotelRoomsController : ControllerBase
         [FromQuery] DateTime fromDate, [FromQuery] DateTime toDate)
         => Ok(await _roomSvc.GetRoomForecastAsync(hotelCode, fromDate, toDate));
 
+    /// GET /api/hotel-rooms/{hotelCode}/room-rack
+    [HttpGet("{hotelCode}/room-rack")]
+    public async Task<IActionResult> GetRoomRack(string hotelCode,
+        [FromQuery] DateTime? fromDate, [FromQuery] int days = 21)
+        => Ok(await _roomSvc.GetRoomRackAsync(hotelCode, fromDate ?? DateTime.Today, days));
+
+    /// PATCH /api/hotel-rooms/{hotelCode}/room-rack/move
+    [HttpPatch("{hotelCode}/room-rack/move")]
+    public async Task<IActionResult> MoveRoomRackBooking(string hotelCode, [FromBody] MoveRoomRackBookingRequest req)
+    {
+        await _roomSvc.MoveRoomRackBookingAsync(hotelCode, req);
+        return Ok(new { message = "Booking room moved." });
+    }
+
     /// POST /api/hotel-rooms/{hotelCode}/block — Block phòng (HOLD/MAINTENANCE)
     [HttpPost("{hotelCode}/block")]
     public async Task<IActionResult> BlockRoom(string hotelCode, [FromBody] BlockRoomRequest req)
@@ -69,7 +83,19 @@ public class HotelRoomsController : ControllerBase
     [HttpPut("{hotelCode}/{roomNo}/beds/{bedCode}")]
     public async Task<IActionResult> UpsertBed(string hotelCode, string roomNo, string bedCode,
         [FromBody] UpsertBedRequest req)
-        => Ok(await _roomSvc.UpsertBedAsync(hotelCode, roomNo, bedCode, req.BedName, req.BedType));
+        => Ok(await _roomSvc.UpsertBedAsync(hotelCode, roomNo, bedCode, req.BedName, req.BedType, req.Status));
+
+    /// PATCH /api/hotel-rooms/{hotelCode}/{roomNo}/beds/{bedCode}/status
+    [HttpPatch("{hotelCode}/{roomNo}/beds/{bedCode}/status")]
+    public async Task<IActionResult> UpdateBedStatus(string hotelCode, string roomNo, string bedCode,
+        [FromBody] UpdateBedStatusRequest req)
+    {
+        req.HotelCode = hotelCode;
+        req.RoomNo = roomNo;
+        req.BedCode = bedCode;
+        await _roomSvc.UpdateBedStatusAsync(req);
+        return Ok(new { message = "Trạng thái giường đã cập nhật." });
+    }
 
     /// DELETE /api/hotel-rooms/{hotelCode}/{roomNo}/beds/{bedCode}
     [HttpDelete("{hotelCode}/{roomNo}/beds/{bedCode}")]
@@ -84,4 +110,5 @@ public class UpsertBedRequest
 {
     public string BedName { get; set; } = string.Empty;
     public string BedType { get; set; } = "SINGLE";
+    public string? Status { get; set; }
 }

@@ -249,6 +249,7 @@ BEGIN
         DepositAmount   DECIMAL(18,2) DEFAULT 0,
         DepositReturned DECIMAL(18,2) DEFAULT 0,
         DamageFee       DECIMAL(18,2) DEFAULT 0,
+        PaidAmount      DECIMAL(18,2) NOT NULL DEFAULT 0,
         -- Tình trạng
         FuelLevelOut    INT DEFAULT 100,         -- Xăng lúc cho thuê
         FuelLevelIn     INT,                     -- Xăng lúc trả

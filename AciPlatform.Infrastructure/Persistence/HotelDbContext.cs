@@ -47,6 +47,11 @@ public class HotelDbContext : DbContext
     public DbSet<HotelTourGuide> HotelTourGuides { get; set; }
     public DbSet<HotelTourSchedule> HotelTourSchedules { get; set; }
 
+    // ── Guide Management (HR Integration) ─────────────────────
+
+    public DbSet<PmsTourGuideContract> PmsTourGuideContracts { get; set; }
+    public DbSet<PmsTourGuideSalary> PmsTourGuideSalaries { get; set; }
+
     // ── Finance ───────────────────────────────────────────────
     public DbSet<HotelInvoice> HotelInvoices { get; set; }
 

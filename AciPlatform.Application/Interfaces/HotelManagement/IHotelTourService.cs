@@ -56,6 +56,7 @@ public class HotelTourGuideDto
 {
     public int Id { get; set; }
     public string HotelCode { get; set; } = string.Empty;
+    public string GuideCode { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string? Phone { get; set; }
     public string? Email { get; set; }
@@ -66,20 +67,128 @@ public class HotelTourGuideDto
     public string? Bio { get; set; }
     public string? ImageUrl { get; set; }
     public bool IsActive { get; set; }
+    // HR integration fields
+    public int? HrEmployeeId { get; set; }
+    public string? IdCard { get; set; }
+    public string? Address { get; set; }
+    public DateOnly? BirthDate { get; set; }
+    public string ContractType { get; set; } = "FREELANCE"; // FREELANCE | FULLTIME | PARTTIME
+    public string? ContractStatus { get; set; }
+    public DateOnly? ContractFrom { get; set; }
+    public DateOnly? ContractTo { get; set; }
+    public decimal MonthlyBaseSalary { get; set; }
+    public int TotalTours { get; set; }
+    public decimal TotalEarned { get; set; }
+    public DateOnly? LastTourDate { get; set; }
+    public string? Rating { get; set; }
 }
 
 public class UpsertTourGuideRequest
 {
     public string HotelCode { get; set; } = string.Empty;
+    public string? GuideCode { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Phone { get; set; }
     public string? Email { get; set; }
     public string? Languages { get; set; }
     public string? Speciality { get; set; }
-    public bool IsFreelance { get; set; } = false;
+    public bool IsFreelance { get; set; } = true;
     public decimal DailyRate { get; set; } = 0;
     public string? Bio { get; set; }
     public bool IsActive { get; set; } = true;
+    public int? HrEmployeeId { get; set; }
+    public string? IdCard { get; set; }
+    public string? Address { get; set; }
+    public DateOnly? BirthDate { get; set; }
+    public string ContractType { get; set; } = "FREELANCE";
+    public DateOnly? ContractFrom { get; set; }
+    public DateOnly? ContractTo { get; set; }
+    public decimal MonthlyBaseSalary { get; set; }
+}
+
+// ── Guide Contract ────────────────────────────────────────────
+public class GuideContractDto
+{
+    public int Id { get; set; }
+    public int GuideId { get; set; }
+    public string GuideName { get; set; } = string.Empty;
+    public string ContractCode { get; set; } = string.Empty;
+    public string ContractType { get; set; } = string.Empty;
+    public DateOnly StartDate { get; set; }
+    public DateOnly? EndDate { get; set; }
+    public decimal BasicSalary { get; set; }
+    public decimal DailyRate { get; set; }
+    public string Status { get; set; } = "ACTIVE";
+    public string? Notes { get; set; }
+    public DateTime CreatedAt { get; set; }
+}
+
+public class CreateGuideContractRequest
+{
+    public string HotelCode { get; set; } = string.Empty;
+    public int GuideId { get; set; }
+    public string ContractType { get; set; } = "FREELANCE";
+    public DateOnly StartDate { get; set; }
+    public DateOnly? EndDate { get; set; }
+    public decimal BasicSalary { get; set; }
+    public decimal DailyRate { get; set; }
+    public string? Notes { get; set; }
+}
+
+// ── Guide Salary/Payment ──────────────────────────────────────
+public class GuideSalaryDto
+{
+    public int Id { get; set; }
+    public int GuideId { get; set; }
+    public string GuideName { get; set; } = string.Empty;
+    public int Month { get; set; }
+    public int Year { get; set; }
+    public int TourCount { get; set; }
+    public decimal DailyRate { get; set; }
+    public decimal TourIncome { get; set; }
+    public decimal BasicSalary { get; set; }
+    public decimal Bonus { get; set; }
+    public decimal Deductions { get; set; }
+    public decimal TotalPay { get; set; }
+    public string Status { get; set; } = "PENDING"; // PENDING | APPROVED | PAID
+    public DateTime? PaidAt { get; set; }
+    public string? Notes { get; set; }
+}
+
+public class CreateGuideSalaryRequest
+{
+    public string HotelCode { get; set; } = string.Empty;
+    public int GuideId { get; set; }
+    public int Month { get; set; }
+    public int Year { get; set; }
+    public decimal Bonus { get; set; }
+    public decimal Deductions { get; set; }
+    public string? Notes { get; set; }
+}
+
+// ── IHotelGuideService ────────────────────────────────────────
+public interface IHotelGuideService
+{
+    // CRUD Guides
+    Task<List<HotelTourGuideDto>> GetGuidesAsync(string hotelCode, bool? isActive = null);
+    Task<HotelTourGuideDto?> GetGuideByIdAsync(int id);
+    Task<HotelTourGuideDto> UpsertGuideAsync(UpsertTourGuideRequest req);
+    Task DeleteGuideAsync(int id);
+    Task ToggleGuideStatusAsync(int id, bool isActive);
+
+    // Contracts
+    Task<List<GuideContractDto>> GetContractsAsync(string hotelCode, int? guideId = null);
+    Task<GuideContractDto> CreateContractAsync(CreateGuideContractRequest req);
+    Task UpdateContractStatusAsync(int contractId, string status);
+
+    // Salary/Payroll
+    Task<List<GuideSalaryDto>> GetSalariesAsync(string hotelCode, int? month = null, int? year = null);
+    Task<GuideSalaryDto> CalculateSalaryAsync(CreateGuideSalaryRequest req);
+    Task ApproveSalaryAsync(int salaryId);
+    Task MarkSalaryPaidAsync(int salaryId);
+
+    // Stats for dashboard
+    Task<object> GetGuideStatsAsync(string hotelCode, int guideId, int year);
 }
 
 public class TourScheduleDto
