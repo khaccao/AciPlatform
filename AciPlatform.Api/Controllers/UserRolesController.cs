@@ -21,6 +21,14 @@ public class UserRolesController : ControllerBase
         _userRoleService = userRoleService;
     }
 
+    [HttpGet("debug-roles")]
+    [AllowAnonymous]
+    public async Task<IActionResult> DebugRoles()
+    {
+        var data = await _userRoleService.GetAll();
+        return Ok(data);
+    }
+
     [HttpGet]
     public async Task<IActionResult> GePaging([FromQuery] PagingRequestModel param)
     {

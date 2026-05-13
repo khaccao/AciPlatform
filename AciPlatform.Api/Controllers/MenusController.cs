@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using Newtonsoft.Json;
 using AciPlatform.Api.Filters;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace AciPlatform.Api.Controllers;
 
@@ -17,10 +19,12 @@ namespace AciPlatform.Api.Controllers;
 public class MenusController : ControllerBase
 {
     private readonly IMenuService _menuService;
+    private readonly IApplicationDbContext _context;
 
-    public MenusController(IMenuService menuService)
+    public MenusController(IMenuService menuService, IApplicationDbContext context)
     {
         _menuService = menuService;
+        _context = context;
     }
 
     [HttpGet]
@@ -33,6 +37,29 @@ public class MenusController : ControllerBase
         List<string> listRole = JsonConvert.DeserializeObject<List<string>>(roles) ?? new List<string>();
 
         return Ok(await _menuService.GetAll(param.Page, param.PageSize, param.SearchText, param.isParent, param.CodeParent, listRole, userId, param.userRoleId));
+    }
+
+    [HttpGet("debug")]
+    public async Task<IActionResult> GetDebugPermissions()
+    {
+        var identityUser = HttpContext.GetIdentityUser();
+        var menus = await _menuService.GetMenuPermissionsByUserId(identityUser.Id);
+        
+        var user = await _context.Users.FindAsync(identityUser.Id);
+        var roleIds = user.UserRoleIds?.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Where(s => int.TryParse(s, out _))
+            .Select(int.Parse).ToList() ?? new List<int>();
+        var roles = await _context.UserRoles.Where(r => roleIds.Contains(r.Id)).ToListAsync();
+
+        return Ok(new {
+            userId = identityUser.Id,
+            username = identityUser.UserName,
+            roleIds = user.UserRoleIds,
+            roles = roles.Select(r => new { r.Id, r.Code, r.Title }),
+            isSuperAdminDetected = roles.Any(r => r.Code == "SuperAdmin"),
+            menuCount = menus.Count(),
+            menus = menus
+        });
     }
 
     [HttpGet("list")]

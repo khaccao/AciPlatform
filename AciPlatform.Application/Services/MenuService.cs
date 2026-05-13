@@ -61,25 +61,103 @@ public class MenuService : IMenuService
 
     public async Task<IEnumerable<MenuPermissionDto>> GetMenuPermissionsByUserId(int userId)
     {
-        var menus = await _context.Menus.OrderBy(x => x.Order).ToListAsync();
-        return menus.Select(x => new MenuPermissionDto
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return Enumerable.Empty<MenuPermissionDto>();
+
+        var roleIds = user.UserRoleIds?.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Where(s => int.TryParse(s, out _))
+            .Select(int.Parse).ToList() ?? new List<int>();
+
+        var roles = await _context.UserRoles.Where(r => roleIds.Contains(r.Id)).ToListAsync();
+        var isSuperAdmin = roles.Any(r => r.Code == "SuperAdmin");
+
+        // DEBUG LOG
+        try {
+            var logPath = Path.Combine(Directory.GetCurrentDirectory(), "permission_debug.log");
+            var roleCodes = string.Join(", ", roles.Select(r => r.Code));
+            File.AppendAllText(logPath, $"[{DateTime.Now}] User: {userId}, Roles: {roleCodes}, isSuperAdmin: {isSuperAdmin}\n");
+        } catch {}
+
+        var allMenus = await _context.Menus.OrderBy(x => x.Order).ToListAsync();
+
+        if (isSuperAdmin)
         {
-            Id = x.Id,
-            MenuCode = x.Code,
-            Name = x.Name,
-            NameEN = x.NameEN,
-            NameKO = x.NameKO,
-            Order = x.Order ?? 0,
-            View = true,
-            Add = true,
-            Edit = true,
-            Delete = true,
-            Approve = true,
-            IsParent = x.IsParent ?? false,
-            CodeParent = x.CodeParent,
-            Icon = x.Icon,
-            Url = x.Url
-        });
+            return allMenus.Select(x => new MenuPermissionDto
+            {
+                Id = x.Id,
+                MenuCode = x.Code,
+                Name = x.Name,
+                NameEN = x.NameEN,
+                NameKO = x.NameKO,
+                Order = x.Order ?? 0,
+                View = true,
+                Add = true,
+                Edit = true,
+                Delete = true,
+                Approve = true,
+                IsParent = x.IsParent ?? false,
+                CodeParent = x.CodeParent,
+                Icon = x.Icon,
+                Url = x.Url
+            });
+        }
+
+        // Get permissions from MenuRoles
+        var menuRolePermissions = await _context.MenuRoles
+            .Where(mr => mr.UserRoleId != null && roleIds.Contains(mr.UserRoleId.Value))
+            .ToListAsync();
+
+        // Get permissions from UserMenus (direct)
+        var userMenuPermissions = await _context.UserMenus
+            .Where(um => um.UserId == userId)
+            .ToListAsync();
+
+        // DEBUG LOG EXTENDED
+        try {
+            var logPath = Path.Combine(Directory.GetCurrentDirectory(), "permission_debug.log");
+            File.AppendAllText(logPath, $" - RolePerms: {menuRolePermissions.Count}, UserPerms: {userMenuPermissions.Count}\n");
+        } catch {}
+
+        var result = new List<MenuPermissionDto>();
+
+        foreach (var menu in allMenus)
+        {
+            var rolePerms = menuRolePermissions.Where(rp => rp.MenuId == menu.Id || (!string.IsNullOrEmpty(rp.MenuCode) && rp.MenuCode == menu.Code)).ToList();
+            var directPerms = userMenuPermissions.Where(up => up.MenuId == menu.Id || (!string.IsNullOrEmpty(up.MenuCode) && up.MenuCode == menu.Code)).ToList();
+
+            bool canView = rolePerms.Any(p => p.View == true) || directPerms.Any(p => p.View == true);
+            
+            // Safety: System menus only for SuperAdmin
+            var systemOnly = new HashSet<string> { "system", "system/roles", "system/security", "menus", "system/menus" };
+            if (!isSuperAdmin && systemOnly.Contains(menu.Code?.ToLower() ?? ""))
+            {
+                canView = false;
+            }
+
+            if (canView)
+            {
+                result.Add(new MenuPermissionDto
+                {
+                    Id = menu.Id,
+                    MenuCode = menu.Code,
+                    Name = menu.Name,
+                    NameEN = menu.NameEN,
+                    NameKO = menu.NameKO,
+                    Order = menu.Order ?? 0,
+                    View = true,
+                    Add = rolePerms.Any(p => p.Add == true) || directPerms.Any(p => p.Add == true),
+                    Edit = rolePerms.Any(p => p.Edit == true) || directPerms.Any(p => p.Edit == true),
+                    Delete = rolePerms.Any(p => p.Delete == true) || directPerms.Any(p => p.Delete == true),
+                    Approve = rolePerms.Any(p => p.Approve == true) || directPerms.Any(p => p.Approve == true),
+                    IsParent = menu.IsParent ?? false,
+                    CodeParent = menu.CodeParent,
+                    Icon = menu.Icon,
+                    Url = menu.Url
+                });
+            }
+        }
+
+        return result;
     }
 
     public async Task<MenuPermissionDto?> CheckRole(string menuCode, List<string> roleCodes)
@@ -87,16 +165,35 @@ public class MenuService : IMenuService
         var menu = await _context.Menus.FirstOrDefaultAsync(x => x.Code == menuCode);
         if (menu == null) return null;
 
+        if (roleCodes.Contains("SuperAdmin"))
+        {
+            return new MenuPermissionDto
+            {
+                Id = menu.Id,
+                MenuCode = menu.Code,
+                Name = menu.Name,
+                View = true, Add = true, Edit = true, Delete = true, Approve = true
+            };
+        }
+
+        var roles = await _context.UserRoles.Where(r => roleCodes.Contains(r.Code)).Select(r => r.Id).ToListAsync();
+        
+        var rolePerms = await _context.MenuRoles
+            .Where(mr => (mr.MenuId == menu.Id || mr.MenuCode == menu.Code) && mr.UserRoleId != null && roles.Contains(mr.UserRoleId.Value))
+            .ToListAsync();
+
+        if (!rolePerms.Any()) return null;
+
         return new MenuPermissionDto
         {
             Id = menu.Id,
             MenuCode = menu.Code,
             Name = menu.Name,
-            View = true,
-            Add = true,
-            Edit = true,
-            Delete = true,
-            Approve = true
+            View = rolePerms.Any(p => p.View == true),
+            Add = rolePerms.Any(p => p.Add == true),
+            Edit = rolePerms.Any(p => p.Edit == true),
+            Delete = rolePerms.Any(p => p.Delete == true),
+            Approve = rolePerms.Any(p => p.Approve == true)
         };
     }
 
