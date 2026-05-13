@@ -26,6 +26,16 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -157,6 +167,7 @@ app.UseSwaggerUI(c =>
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowAll");
 app.UseAuthentication(); // Ensure Authentication middleware is added
 app.UseAuthorization();
 
