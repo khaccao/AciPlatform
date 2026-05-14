@@ -139,7 +139,7 @@ public class MenuService : IMenuService
                 result.Add(new MenuPermissionDto
                 {
                     Id = menu.Id,
-                    MenuCode = menu.Code,
+                    MenuCode = menu.Code ?? string.Empty,
                     Name = menu.Name,
                     NameEN = menu.NameEN,
                     NameKO = menu.NameKO,

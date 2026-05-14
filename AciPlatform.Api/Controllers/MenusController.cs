@@ -46,6 +46,8 @@ public class MenusController : ControllerBase
         var menus = await _menuService.GetMenuPermissionsByUserId(identityUser.Id);
         
         var user = await _context.Users.FindAsync(identityUser.Id);
+        if (user == null) return NotFound("User not found");
+
         var roleIds = user.UserRoleIds?.Split(',', StringSplitOptions.RemoveEmptyEntries)
             .Where(s => int.TryParse(s, out _))
             .Select(int.Parse).ToList() ?? new List<int>();
