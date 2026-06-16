@@ -9,6 +9,7 @@ using AciPlatform.Domain.Entities.MultiChannel;
 using AciPlatform.Domain.Entities.QLKho;
 using AciPlatform.Domain.Entities.FleetTransportation;
 using AciPlatform.Domain.Entities.Sell;
+using AciPlatform.Domain.Entities.RestaurantErp;
 using Microsoft.EntityFrameworkCore;
 
 namespace AciPlatform.Application.Interfaces;
@@ -98,6 +99,30 @@ public interface IApplicationDbContext
     DbSet<OrderDetail> OrderDetails { get; }
     DbSet<OrderSuccessful> OrderSuccessfuls { get; }
     DbSet<Payer> Payers { get; }
+
+    // Restaurant ERP
+    DbSet<RestaurantFund> RestaurantFunds { get; }
+    DbSet<RestaurantCapitalContribution> RestaurantCapitalContributions { get; }
+    DbSet<RestaurantSetupExpense> RestaurantSetupExpenses { get; }
+    DbSet<RestaurantMaterialGroup> RestaurantMaterialGroups { get; }
+    DbSet<RestaurantMaterial> RestaurantMaterials { get; }
+    DbSet<RestaurantPurchaseRequest> RestaurantPurchaseRequests { get; }
+    DbSet<RestaurantPurchaseRequestDetail> RestaurantPurchaseRequestDetails { get; }
+    DbSet<RestaurantPurchaseOrder> RestaurantPurchaseOrders { get; }
+    DbSet<RestaurantPurchaseOrderDetail> RestaurantPurchaseOrderDetails { get; }
+    DbSet<RestaurantGoodsReceipt> RestaurantGoodsReceipts { get; }
+    DbSet<RestaurantGoodsReceiptDetail> RestaurantGoodsReceiptDetails { get; }
+    DbSet<RestaurantStockTransaction> RestaurantStockTransactions { get; }
+    DbSet<RestaurantStockBalance> RestaurantStockBalances { get; }
+    DbSet<RestaurantPaymentRequest> RestaurantPaymentRequests { get; }
+    DbSet<RestaurantPaymentRequestDetail> RestaurantPaymentRequestDetails { get; }
+    DbSet<RestaurantDisbursement> RestaurantDisbursements { get; }
+    DbSet<RestaurantSupplierDebt> RestaurantSupplierDebts { get; }
+    DbSet<RestaurantSupplierDebtPayment> RestaurantSupplierDebtPayments { get; }
+    DbSet<RestaurantCustomerDebt> RestaurantCustomerDebts { get; }
+    DbSet<RestaurantCustomerDebtReceipt> RestaurantCustomerDebtReceipts { get; }
+    DbSet<RestaurantApprovalHistory> RestaurantApprovalHistories { get; }
+    DbSet<RestaurantAttachment> RestaurantAttachments { get; }
     
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

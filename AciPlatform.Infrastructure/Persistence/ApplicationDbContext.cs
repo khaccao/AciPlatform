@@ -9,6 +9,7 @@ using AciPlatform.Domain.Entities.MultiChannel;
 using AciPlatform.Domain.Entities.QLKho;
 using AciPlatform.Domain.Entities.FleetTransportation;
 using AciPlatform.Domain.Entities.Sell;
+using AciPlatform.Domain.Entities.RestaurantErp;
 using Microsoft.EntityFrameworkCore;
 
 namespace AciPlatform.Infrastructure.Persistence;
@@ -99,6 +100,30 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<OrderSuccessful> OrderSuccessfuls { get; set; }
     public DbSet<Payer> Payers { get; set; }
 
+    // Restaurant ERP
+    public DbSet<RestaurantFund> RestaurantFunds { get; set; }
+    public DbSet<RestaurantCapitalContribution> RestaurantCapitalContributions { get; set; }
+    public DbSet<RestaurantSetupExpense> RestaurantSetupExpenses { get; set; }
+    public DbSet<RestaurantMaterialGroup> RestaurantMaterialGroups { get; set; }
+    public DbSet<RestaurantMaterial> RestaurantMaterials { get; set; }
+    public DbSet<RestaurantPurchaseRequest> RestaurantPurchaseRequests { get; set; }
+    public DbSet<RestaurantPurchaseRequestDetail> RestaurantPurchaseRequestDetails { get; set; }
+    public DbSet<RestaurantPurchaseOrder> RestaurantPurchaseOrders { get; set; }
+    public DbSet<RestaurantPurchaseOrderDetail> RestaurantPurchaseOrderDetails { get; set; }
+    public DbSet<RestaurantGoodsReceipt> RestaurantGoodsReceipts { get; set; }
+    public DbSet<RestaurantGoodsReceiptDetail> RestaurantGoodsReceiptDetails { get; set; }
+    public DbSet<RestaurantStockTransaction> RestaurantStockTransactions { get; set; }
+    public DbSet<RestaurantStockBalance> RestaurantStockBalances { get; set; }
+    public DbSet<RestaurantPaymentRequest> RestaurantPaymentRequests { get; set; }
+    public DbSet<RestaurantPaymentRequestDetail> RestaurantPaymentRequestDetails { get; set; }
+    public DbSet<RestaurantDisbursement> RestaurantDisbursements { get; set; }
+    public DbSet<RestaurantSupplierDebt> RestaurantSupplierDebts { get; set; }
+    public DbSet<RestaurantSupplierDebtPayment> RestaurantSupplierDebtPayments { get; set; }
+    public DbSet<RestaurantCustomerDebt> RestaurantCustomerDebts { get; set; }
+    public DbSet<RestaurantCustomerDebtReceipt> RestaurantCustomerDebtReceipts { get; set; }
+    public DbSet<RestaurantApprovalHistory> RestaurantApprovalHistories { get; set; }
+    public DbSet<RestaurantAttachment> RestaurantAttachments { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -171,6 +196,46 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Token).HasMaxLength(200);
             entity.HasIndex(e => e.Token).IsUnique();
+        });
+
+        modelBuilder.Entity<RestaurantFund>(entity =>
+        {
+            entity.HasIndex(e => new { e.CompanyCode, e.Code }).IsUnique();
+        });
+
+        modelBuilder.Entity<RestaurantMaterial>(entity =>
+        {
+            entity.HasIndex(e => new { e.CompanyCode, e.Code }).IsUnique();
+        });
+
+        modelBuilder.Entity<RestaurantMaterialGroup>(entity =>
+        {
+            entity.HasIndex(e => new { e.CompanyCode, e.Code }).IsUnique();
+        });
+
+        modelBuilder.Entity<RestaurantPurchaseRequest>(entity =>
+        {
+            entity.HasIndex(e => new { e.CompanyCode, e.Code }).IsUnique();
+        });
+
+        modelBuilder.Entity<RestaurantPurchaseOrder>(entity =>
+        {
+            entity.HasIndex(e => new { e.CompanyCode, e.Code }).IsUnique();
+        });
+
+        modelBuilder.Entity<RestaurantGoodsReceipt>(entity =>
+        {
+            entity.HasIndex(e => new { e.CompanyCode, e.Code }).IsUnique();
+        });
+
+        modelBuilder.Entity<RestaurantPaymentRequest>(entity =>
+        {
+            entity.HasIndex(e => new { e.CompanyCode, e.Code }).IsUnique();
+        });
+
+        modelBuilder.Entity<RestaurantStockBalance>(entity =>
+        {
+            entity.HasIndex(e => new { e.CompanyCode, e.MaterialId, e.WarehouseCode }).IsUnique();
         });
 
         // Configure R&D Project Management

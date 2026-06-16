@@ -16,6 +16,11 @@ using AciPlatform.Application.Interfaces.FleetTransportation;
 using AciPlatform.Application.Services.FleetTransportation;
 using AciPlatform.Application.Interfaces.MultiChannel;
 using AciPlatform.Application.Services.MultiChannel;
+using AciPlatform.Application.Interfaces.QLKho;
+using AciPlatform.Application.Services.QLKho;
+using AciPlatform.Application.Interfaces.RestaurantErp;
+using AciPlatform.Application.Services.RestaurantErp;
+using AciPlatform.Application.Services.Ledger;
 using AciPlatform.Api.Filters;
 using AciPlatform.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -113,6 +118,15 @@ builder.Services.AddScoped<IAutomationService, AutomationService>();
 builder.Services.AddScoped<ITwoFactorService, TwoFactorService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<FleetExceptionFilter>();
+builder.Services.AddScoped<IInternalAccountingService, InternalAccountingService>();
+builder.Services.AddScoped<IWarehouseService, WarehouseService>();
+builder.Services.AddScoped<IWareHouseFloorService, WareHouseFloorService>();
+builder.Services.AddScoped<IWareHouseShelvesService, WareHouseShelvesService>();
+builder.Services.AddScoped<IWareHousePositionService, WareHousePositionService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<IGoodWarehousesService, GoodWarehousesService>();
+builder.Services.AddScoped<IGoodWarehouseExportService, GoodWarehouseExportService>();
+builder.Services.AddScoped<IRestaurantErpService, RestaurantErpService>();
 
 // Configure DbContext with Dynamic Connection String
 builder.Services.AddDbContext<AciPlatform.Infrastructure.Persistence.ApplicationDbContext>((sp, options) =>
